@@ -767,16 +767,16 @@
             <div style="display:flex;gap:6px;margin-top:9px;"><span class="service-tag" style="background:rgba(50,220,130,0.1);color:var(--success);">Incluido</span></div>
           </div>
         </div>
-        <div class="service-card">
+        <div class="service-card" id="card-ingredients" onclick="handleServiceClick('screen-ingredients')">
           <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Pro</div>
           <div class="service-icon" style="background:rgba(255,110,145,0.12);">💊</div>
           <div>
             <div class="service-name">Scanner de ingredientes</div>
-            <div class="service-desc">Escanea la etiqueta de cualquier producto. Detecta ingredientes daninos, comedogenicos o incompatibles con tu piel.</div>
+            <div class="service-desc">Pega la lista de ingredientes de cualquier producto. La IA detecta lo bueno, lo dañino y lo incompatible con tu piel.</div>
             <div style="display:flex;gap:6px;margin-top:9px;"><span class="service-tag" style="background:rgba(255,210,125,0.1);color:var(--gold);">Plan Pro</span></div>
           </div>
         </div>
-        <div class="service-card">
+        <div class="service-card" id="card-tracker" onclick="handleServiceClick('screen-tracker')">
           <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Pro</div>
           <div class="service-icon" style="background:rgba(100,180,255,0.12);">📈</div>
           <div>
@@ -785,7 +785,7 @@
             <div style="display:flex;gap:6px;margin-top:9px;"><span class="service-tag" style="background:rgba(255,210,125,0.1);color:var(--gold);">Plan Pro</span></div>
           </div>
         </div>
-        <div class="service-card">
+        <div class="service-card" id="card-dermatologa" onclick="handleServiceClick('screen-dermatologa')">
           <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Ultra</div>
           <div class="service-icon" style="background:rgba(50,220,130,0.1);">👩‍⚕️</div>
           <div>
@@ -794,7 +794,7 @@
             <div style="display:flex;gap:6px;margin-top:9px;"><span class="service-tag" style="background:rgba(196,125,255,0.1);color:#c47dff;">Plan Ultra</span></div>
           </div>
         </div>
-        <div class="service-card">
+        <div class="service-card" id="card-hormonal" onclick="handleServiceClick('screen-hormonal')">
           <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Ultra</div>
           <div class="service-icon" style="background:rgba(196,125,255,0.12);">🌙</div>
           <div>
@@ -803,7 +803,7 @@
             <div style="display:flex;gap:6px;margin-top:9px;"><span class="service-tag" style="background:rgba(196,125,255,0.1);color:#c47dff;">Plan Ultra</span></div>
           </div>
         </div>
-        <div class="service-card">
+        <div class="service-card" id="card-diet" onclick="handleServiceClick('screen-diet')">
           <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Ultra</div>
           <div class="service-icon" style="background:rgba(255,210,125,0.12);">🥗</div>
           <div>
@@ -883,6 +883,172 @@
     </div>
   </div>
 
+  <!-- SCANNER DE INGREDIENTES -->
+  <div id="screen-ingredients" class="screen" style="background:var(--dark);">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-services')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Scanner de ingredientes</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div class="scroll-view">
+      <div style="padding:8px 20px 16px;">
+        <div style="color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:16px;">Pega la lista de ingredientes de cualquier producto cosmético y la IA detectará lo que es bueno o dañino para tu piel.</div>
+        <textarea id="ingredients-input" placeholder="Ej: Aqua, Glycerin, Niacinamide, Fragrance, Alcohol Denat, Sodium Lauryl Sulfate..." style="width:100%;height:130px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:14px;color:#fff;font-size:12px;resize:none;outline:none;font-family:inherit;line-height:1.6;"></textarea>
+        <button onclick="analyzeIngredients()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,var(--g1),var(--pink));color:#fff;border:none;border-radius:14px;padding:15px;font-size:14px;font-weight:500;cursor:pointer;">💊 Analizar ingredientes</button>
+      </div>
+      <div id="ingredients-result" style="display:none;padding:0 20px 24px;">
+        <div style="color:#fff;font-size:13px;font-weight:500;margin-bottom:12px;">Resultado del análisis:</div>
+        <div id="ingredients-good" style="margin-bottom:12px;"></div>
+        <div id="ingredients-bad" style="margin-bottom:12px;"></div>
+        <div id="ingredients-neutral" style="margin-bottom:12px;"></div>
+        <div style="background:rgba(255,154,108,0.08);border:1px solid rgba(255,154,108,0.2);border-radius:14px;padding:14px;margin-top:8px;">
+          <div style="color:var(--g1);font-size:11px;font-weight:500;margin-bottom:6px;">💡 Recomendación Glowia IA</div>
+          <div id="ingredients-rec" style="color:rgba(255,255,255,0.65);font-size:11px;line-height:1.6;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKER DE PROGRESO -->
+  <div id="screen-tracker" class="screen" style="background:var(--dark);">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-services')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Tracker de progreso</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div class="scroll-view">
+      <div style="padding:8px 20px 16px;">
+        <div style="background:linear-gradient(135deg,rgba(255,154,108,0.12),rgba(255,110,145,0.06));border:1px solid rgba(255,154,108,0.2);border-radius:18px;padding:16px;margin-bottom:16px;text-align:center;">
+          <div style="color:var(--muted);font-size:11px;margin-bottom:6px;">Progreso general</div>
+          <div style="color:var(--g1);font-size:42px;font-weight:500;">+12%</div>
+          <div style="color:var(--success);font-size:12px;margin-top:4px;">↑ Mejora en las últimas 4 semanas</div>
+        </div>
+        <div style="color:#fff;font-size:13px;font-weight:500;margin-bottom:12px;">Evolución semanal</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          ${['Semana 1','Semana 2','Semana 3','Semana 4 (hoy)'].map((s,i)=>{
+            const vals=[62,68,73,78];
+            return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:rgba(255,255,255,0.6);font-size:11px;">${s}</span><span style="color:#fff;font-size:12px;font-weight:500;">${vals[i]}/100</span></div>
+              <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${vals[i]}%;background:linear-gradient(90deg,var(--g1),var(--pink));border-radius:3px;"></div></div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="color:#fff;font-size:13px;font-weight:500;margin-bottom:12px;">Indicadores esta semana</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">💧</div><div style="color:#fff;font-size:14px;font-weight:500;">82%</div><div style="color:var(--muted);font-size:10px;">Hidratación</div><div style="color:var(--success);font-size:10px;">+8%</div></div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">✨</div><div style="color:#fff;font-size:14px;font-weight:500;">71%</div><div style="color:var(--muted);font-size:10px;">Elasticidad</div><div style="color:var(--success);font-size:10px;">+5%</div></div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🔴</div><div style="color:#fff;font-size:14px;font-weight:500;">65%</div><div style="color:var(--muted);font-size:10px;">Uniformidad</div><div style="color:var(--success);font-size:10px;">+3%</div></div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🌟</div><div style="color:#fff;font-size:14px;font-weight:500;">58%</div><div style="color:var(--muted);font-size:10px;">Luminosidad</div><div style="color:#ffd27d;font-size:10px;">-2%</div></div>
+        </div>
+        <div style="background:rgba(50,220,130,0.06);border:1px solid rgba(50,220,130,0.15);border-radius:14px;padding:14px;">
+          <div style="color:var(--success);font-size:12px;font-weight:500;margin-bottom:6px;">📈 Análisis de tendencia</div>
+          <div style="color:rgba(255,255,255,0.6);font-size:11px;line-height:1.7;">Tu piel muestra una mejora consistente. La hidratación y elasticidad responden bien a tu rutina actual. Continúa con el sérum de niacinamida en la mañana — es tu ingrediente estrella.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DERMATOLOGA IA -->
+  <div id="screen-dermatologa" class="screen" style="background:var(--dark);">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-services')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Dermatologa IA 24/7</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div style="padding:10px 16px 6px;background:rgba(50,220,130,0.06);border-bottom:1px solid rgba(50,220,130,0.12);display:flex;align-items:center;gap:10px;">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--g1),var(--pink));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👩‍⚕️</div>
+      <div><div style="color:#fff;font-size:13px;font-weight:500;">Dra. Glowia IA</div><div style="color:var(--success);font-size:10px;">● En línea ahora</div></div>
+    </div>
+    <div id="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--g1),var(--pink));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">👩‍⚕️</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:12px 14px;max-width:80%;">
+          <div style="color:#fff;font-size:12px;line-height:1.6;">Hola, soy la Dra. Glowia IA. Estoy aquí para orientarte sobre el cuidado de tu piel las 24 horas. ¿Qué preocupación tienes hoy?</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding-left:40px;">
+        <button onclick="sendQuickMsg(this)" style="background:rgba(255,154,108,0.1);border:1px solid rgba(255,154,108,0.3);border-radius:20px;padding:7px 14px;color:var(--g1);font-size:11px;cursor:pointer;">Tengo acné</button>
+        <button onclick="sendQuickMsg(this)" style="background:rgba(255,154,108,0.1);border:1px solid rgba(255,154,108,0.3);border-radius:20px;padding:7px 14px;color:var(--g1);font-size:11px;cursor:pointer;">Piel seca</button>
+        <button onclick="sendQuickMsg(this)" style="background:rgba(255,154,108,0.1);border:1px solid rgba(255,154,108,0.3);border-radius:20px;padding:7px 14px;color:var(--g1);font-size:11px;cursor:pointer;">Manchas oscuras</button>
+        <button onclick="sendQuickMsg(this)" style="background:rgba(255,154,108,0.1);border:1px solid rgba(255,154,108,0.3);border-radius:20px;padding:7px 14px;color:var(--g1);font-size:11px;cursor:pointer;">Poros dilatados</button>
+      </div>
+    </div>
+    <div style="padding:12px 16px 24px;display:flex;gap:8px;border-top:1px solid var(--border);">
+      <input id="chat-input" type="text" placeholder="Escribe tu consulta..." style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:12px 16px;color:#fff;font-size:13px;outline:none;" onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button onclick="sendChat()" style="width:44px;height:44px;background:linear-gradient(135deg,var(--g1),var(--pink));border:none;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">→</button>
+    </div>
+  </div>
+
+  <!-- ANALISIS HORMONAL -->
+  <div id="screen-hormonal" class="screen" style="background:var(--dark);">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-services')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Análisis hormonal y ciclo</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div class="scroll-view">
+      <div style="padding:8px 20px 20px;">
+        <div style="color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:16px;">Ingresa los datos de tu ciclo y Glowia IA predice cómo estará tu piel en cada fase y qué hacer al respecto.</div>
+        <div id="hormonal-form">
+          <div style="margin-bottom:14px;"><label style="color:rgba(255,255,255,0.7);font-size:12px;display:block;margin-bottom:6px;">¿En qué día de tu ciclo estás? (1 = primer día de menstruación)</label><input id="cycle-day" type="number" min="1" max="35" placeholder="Ej: 14" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;"/></div>
+          <div style="margin-bottom:14px;"><label style="color:rgba(255,255,255,0.7);font-size:12px;display:block;margin-bottom:6px;">Duración promedio de tu ciclo (días)</label><input id="cycle-len" type="number" min="21" max="40" placeholder="Ej: 28" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;"/></div>
+          <div style="margin-bottom:20px;"><label style="color:rgba(255,255,255,0.7);font-size:12px;display:block;margin-bottom:8px;">¿Tu piel empeora antes del periodo?</label><div style="display:flex;gap:8px;"><button id="btn-si" onclick="setCycleSkin('si')" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--muted);cursor:pointer;font-size:13px;">Sí</button><button id="btn-no" onclick="setCycleSkin('no')" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--muted);cursor:pointer;font-size:13px;">No</button><button id="btn-aveces" onclick="setCycleSkin('aveces')" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--muted);cursor:pointer;font-size:13px;">A veces</button></div></div>
+          <button onclick="analyzeHormonal()" style="width:100%;background:linear-gradient(135deg,var(--g1),var(--pink));color:#fff;border:none;border-radius:14px;padding:15px;font-size:14px;font-weight:500;cursor:pointer;">🌙 Analizar mi ciclo</button>
+        </div>
+        <div id="hormonal-result" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIETA Y PIEL -->
+  <div id="screen-diet" class="screen" style="background:var(--dark);">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-services')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Dieta y piel</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div class="scroll-view">
+      <div style="padding:8px 20px 24px;">
+        <div style="background:linear-gradient(135deg,rgba(255,210,125,0.1),rgba(255,154,108,0.05));border:1px solid rgba(255,210,125,0.2);border-radius:18px;padding:16px;margin-bottom:18px;">
+          <div style="color:var(--gold);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Plan nutricional para piel mixta</div>
+          <div style="color:#fff;font-size:13px;font-weight:500;">Basado en tu análisis Glowia IA</div>
+        </div>
+
+        <div style="color:#fff;font-size:13px;font-weight:500;margin-bottom:12px;">🟢 Aliados de tu piel — Come más de esto</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+          <div style="background:var(--card);border:1px solid rgba(50,220,130,0.2);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;"><div style="font-size:22px;">🥑</div><div><div style="color:#fff;font-size:12px;font-weight:500;">Aguacate</div><div style="color:var(--muted);font-size:11px;line-height:1.5;">Rico en vitamina E y grasas saludables. Mejora la elasticidad y reduce la inflamación.</div></div></div>
+          <div style="background:var(--card);border:1px solid rgba(50,220,130,0.2);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;"><div style="font-size:22px;">🫐</div><div><div style="color:#fff;font-size:12px;font-weight:500;">Arándanos</div><div style="color:var(--muted);font-size:11px;line-height:1.5;">Antioxidantes que combaten el daño por radicales libres y reducen el enrojecimiento.</div></div></div>
+          <div style="background:var(--card);border:1px solid rgba(50,220,130,0.2);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;"><div style="font-size:22px;">🥦</div><div><div style="color:#fff;font-size:12px;font-weight:500;">Brócoli</div><div style="color:var(--muted);font-size:11px;line-height:1.5;">Vitamina C para síntesis de colágeno. Zinc para controlar el sebo y prevenir acné.</div></div></div>
+          <div style="background:var(--card);border:1px solid rgba(50,220,130,0.2);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;"><div style="font-size:22px;">🐟</div><div><div style="color:#fff;font-size:12px;font-weight:500;">Salmon / Sardinas</div><div style="color:var(--muted);font-size:11px;line-height:1.5;">Omega-3 que reduce la inflamación y mantiene la barrera cutánea hidratada.</div></div></div>
+          <div style="background:var(--card);border:1px solid rgba(50,220,130,0.2);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;"><div style="font-size:22px;">🍵</div><div><div style="color:#fff;font-size:12px;font-weight:500;">Té verde</div><div style="color:var(--muted);font-size:11px;line-height:1.5;">EGCG reduce la producción de sebo y mejora la uniformidad del tono.</div></div></div>
+        </div>
+
+        <div style="color:#fff;font-size:13px;font-weight:500;margin-bottom:12px;">🔴 Enemigos de tu piel — Reduce o evita</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+          <div style="background:var(--card);border:1px solid rgba(255,85,85,0.15);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;"><div style="font-size:22px;">🍬</div><div><div style="color:#fff;font-size:12px;font-weight:500;">Azúcar refinada</div><div style="color:var(--muted);font-size:11px;line-height:1.5;">Dispara la inflamación y la glicación, que destruye el colágeno y acelera el envejecimiento.</div></div></div>
+          <div style="background:var(--card);border:1px solid rgba(255,85,85,0.15);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;"><div style="font-size:22px;">🥛</div><div><div style="color:#fff;font-size:12px;font-weight:500;">Lácteos en exceso</div><div style="color:var(--muted);font-size:11px;line-height:1.5;">En piel mixta, los lácteos pueden estimular la producción de sebo y empeorar los poros.</div></div></div>
+          <div style="background:var(--card);border:1px solid rgba(255,85,85,0.15);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;"><div style="font-size:22px;">🍟</div><div><div style="color:#fff;font-size:12px;font-weight:500;">Fritos y ultraprocesados</div><div style="color:var(--muted);font-size:11px;line-height:1.5;">Grasas trans que aumentan la inflamación y la rojez detectada en tu análisis.</div></div></div>
+        </div>
+
+        <div style="background:rgba(255,154,108,0.08);border:1px solid rgba(255,154,108,0.2);border-radius:16px;padding:16px;">
+          <div style="color:var(--g1);font-size:12px;font-weight:500;margin-bottom:8px;">💧 Meta de hidratación diaria</div>
+          <div style="color:#fff;font-size:22px;font-weight:500;margin-bottom:4px;">2.5 litros</div>
+          <div style="color:var(--muted);font-size:11px;line-height:1.5;">La deshidratación detectada en tu contorno de ojos mejora significativamente con una hidratación adecuada desde adentro.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- end .phone -->
 
 <script>
@@ -890,6 +1056,11 @@
   const ADMIN_PASS  = 'Glowia2024';
   let isAdmin = false;
   let users = [];
+
+  function handleServiceClick(screen) {
+    if (isAdmin) { showScreen(screen); return; }
+    showScreen('screen-plans');
+  }
 
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1211,6 +1382,124 @@
       document.getElementById('btn-pro').onclick   = () => window.open(pricing.monthly.btnPro, '_blank');
       document.getElementById('btn-ultra').onclick = () => window.open(pricing.monthly.btnUltra, '_blank');
     }
+  }
+
+  /* SCANNER INGREDIENTES */
+  const badIngredients  = ['sodium lauryl sulfate','sls','alcohol denat','fragrance','parfum','mineral oil','parabens','methylparaben','propylparaben','formaldehyde','phthalates','triclosan','oxybenzone','coal tar','hydroquinone','lead','mercury'];
+  const goodIngredients = ['niacinamide','hyaluronic acid','ceramide','retinol','vitamin c','ascorbic acid','glycerin','peptide','aha','bha','salicylic acid','lactic acid','glycolic acid','centella asiatica','green tea','zinc','allantoin','panthenol','squalane','arbutin'];
+
+  function analyzeIngredients() {
+    const raw = document.getElementById('ingredients-input').value.toLowerCase();
+    if (!raw.trim()) return;
+    const items = raw.split(/[,\n]+/).map(x => x.trim()).filter(Boolean);
+    const found_bad  = items.filter(i => badIngredients.some(b => i.includes(b)));
+    const found_good = items.filter(i => goodIngredients.some(g => i.includes(g)));
+    const found_neutral = items.filter(i => !found_bad.some(b => i.includes(b)) && !found_good.some(g => i.includes(g)));
+
+    const makeList = (arr, color, icon) => arr.length ? arr.map(i =>
+      `<div style="background:var(--card);border:1px solid ${color}22;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="font-size:14px;">${icon}</span>
+        <span style="color:#fff;font-size:12px;text-transform:capitalize;">${i}</span>
+      </div>`).join('') : '';
+
+    document.getElementById('ingredients-good').innerHTML    = found_good.length    ? `<div style="color:var(--success);font-size:11px;font-weight:500;margin-bottom:8px;">✓ Ingredientes beneficiosos (${found_good.length})</div>` + makeList(found_good,'#32dc82','✅')    : '';
+    document.getElementById('ingredients-bad').innerHTML     = found_bad.length     ? `<div style="color:#ff9999;font-size:11px;font-weight:500;margin-bottom:8px;">⚠ Ingredientes a evitar (${found_bad.length})</div>` + makeList(found_bad,'#ff5555','❌')              : '';
+    document.getElementById('ingredients-neutral').innerHTML = found_neutral.length ? `<div style="color:var(--muted);font-size:11px;font-weight:500;margin-bottom:8px;">Otros ingredientes (${found_neutral.length})</div>` + makeList(found_neutral,'#ffffff','⚪')           : '';
+
+    const recs = [];
+    if (found_bad.some(i => i.includes('fragrance') || i.includes('parfum'))) recs.push('Contiene fragancia que puede irritar piel sensible.');
+    if (found_bad.some(i => i.includes('alcohol'))) recs.push('El alcohol desnaturalizado reseca la piel mixta.');
+    if (found_bad.some(i => i.includes('sulfate'))) recs.push('Los sulfatos eliminan el sebo natural y alteran la barrera.');
+    if (found_good.some(i => i.includes('niacinamide'))) recs.push('La niacinamida es excelente para tu tipo de piel.');
+    if (found_good.some(i => i.includes('ceramide'))) recs.push('Las ceramidas reparan tu barrera cutánea.');
+    if (!recs.length) recs.push('Producto con perfil de ingredientes neutro. Apto para uso general.');
+
+    document.getElementById('ingredients-rec').textContent = recs.join(' ');
+    document.getElementById('ingredients-result').style.display = 'block';
+  }
+
+  /* CHAT DERMATOLOGA */
+  const chatResponses = {
+    'acné':       'El acné hormonal en adultas suele concentrarse en la zona del mentón y mandíbula. Te recomiendo: ácido salicílico 2% para limpiar poros, niacinamida 10% para reducir inflamación y peróxido de benzoilo 2.5% puntual en granitos activos. Evita tocarlos y cambia tu funda de almohada cada 3 días.',
+    'piel seca':  'Para piel seca, la clave está en una rutina que no agote la barrera. Limpiador sin sulfatos, sérum de ácido hialurónico en piel húmeda, crema con ceramidas y aceite facial de noche (rosa mosqueta o escualano). Hidrata desde adentro con mínimo 2 litros de agua.',
+    'manchas':    'Las manchas oscuras o hiperpigmentación responden bien a: vitamina C en la mañana (protege y aclara), niacinamida que inhibe la melanina, AHA o ácido glicólico 3x/semana de noche para renovar. Protector solar SPF 50+ es OBLIGATORIO — sin él, cualquier tratamiento es inútil.',
+    'poros':      'Los poros dilatados no se "cierran" pero sí se minimizan. Usa ácido salicílico 1-2% para limpiarlos desde adentro, niacinamida para afinar la textura, y arcilla 1-2 veces por semana como mascarilla. Evita extractores manuales que los agrandan.',
+    'default':    'Entiendo tu preocupación. Para darte la orientación más precisa, te recomiendo hacer el escaneo facial Glowia IA — así puedo analizar tu piel en detalle y personalizar la respuesta. ¿Hay algo específico que notes en tu piel últimamente?'
+  };
+
+  function sendQuickMsg(btn) {
+    const msg = btn.textContent;
+    btn.parentElement.style.display = 'none';
+    appendChatMsg(msg, 'user');
+    setTimeout(() => {
+      const key = Object.keys(chatResponses).find(k => msg.toLowerCase().includes(k)) || 'default';
+      appendChatMsg(chatResponses[key], 'bot');
+    }, 800);
+  }
+
+  function sendChat() {
+    const input = document.getElementById('chat-input');
+    const msg   = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    appendChatMsg(msg, 'user');
+    setTimeout(() => {
+      const key = Object.keys(chatResponses).find(k => msg.toLowerCase().includes(k)) || 'default';
+      appendChatMsg(chatResponses[key], 'bot');
+    }, 900);
+  }
+
+  function appendChatMsg(text, from) {
+    const msgs = document.getElementById('chat-messages');
+    const div  = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:10px;align-items:flex-start;' + (from==='user' ? 'flex-direction:row-reverse;' : '');
+    div.innerHTML = from === 'bot'
+      ? `<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--g1),var(--pink));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">👩‍⚕️</div>
+         <div style="background:var(--card);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:12px 14px;max-width:80%;"><div style="color:#fff;font-size:12px;line-height:1.6;">${text}</div></div>`
+      : `<div style="background:linear-gradient(135deg,var(--g1),var(--pink));border-radius:16px 16px 4px 16px;padding:12px 14px;max-width:80%;"><div style="color:#fff;font-size:12px;line-height:1.6;">${text}</div></div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  /* HORMONAL */
+  let cycleSkinAnswer = '';
+  function setCycleSkin(val) {
+    cycleSkinAnswer = val;
+    ['si','no','aveces'].forEach(v => {
+      const b = document.getElementById('btn-' + v);
+      b.style.background = v === val ? 'rgba(255,154,108,0.2)' : 'rgba(255,255,255,0.05)';
+      b.style.color      = v === val ? 'var(--g1)'             : 'var(--muted)';
+      b.style.borderColor= v === val ? 'rgba(255,154,108,0.5)' : 'var(--border)';
+    });
+  }
+
+  function analyzeHormonal() {
+    const day = parseInt(document.getElementById('cycle-day').value) || 14;
+    const len = parseInt(document.getElementById('cycle-len').value) || 28;
+    const phase = day <= 5 ? 'menstrual' : day <= 13 ? 'folicular' : day <= 16 ? 'ovulacion' : 'lutea';
+    const phaseInfo = {
+      menstrual: { name:'Fase Menstrual', icon:'🔴', skin:'Piel sensible y con tendencia a rojez. Los niveles de estrógeno y progesterona están bajos.', tips:['Usa limpiador extra suave sin sulfatos','Evita exfoliantes y retinol esta semana','Hidrata más de lo normal — tu barrera está débil','Un sérum calmante con centella asiática ayudará mucho'] },
+      folicular: { name:'Fase Folicular', icon:'🌸', skin:'Tu piel empieza a brillar. El estrógeno sube y mejora la hidratación y elasticidad naturalmente.', tips:['Aprovecha para exfoliar 1-2 veces esta semana','Puedes introducir vitamina C en tu rutina','La piel absorbe mejor los activos — perfecto para tratar manchas','Es tu mejor semana para procedimientos estéticos'] },
+      ovulacion: { name:'Fase de Ovulación', icon:'✨', skin:'Pico de estrógeno — tu piel está en su mejor momento. Brillo natural y máxima hidratación.', tips:['Mantén tu rutina básica','Protector solar más importante que nunca (piel más reactiva a UV)','Es buen momento para mascarillas hidratantes','Controla el exceso de sebo en la zona T'] },
+      lutea:     { name:'Fase Lútea', icon:'🌙', skin:'La progesterona aumenta el sebo. Aumenta riesgo de brotes hormonales antes del periodo.', tips:['Agrega ácido salicílico preventivo en zona T','Reduce lácteos y azúcar esta semana','Niacinamida es tu aliada para controlar sebo','Evita tratamientos agresivos — tu piel está más inflamable'] }
+    };
+    const info = phaseInfo[phase];
+    document.getElementById('hormonal-form').style.display = 'none';
+    document.getElementById('hormonal-result').style.display = 'block';
+    document.getElementById('hormonal-result').innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(255,154,108,0.12),rgba(196,125,255,0.06));border:1px solid rgba(196,125,255,0.2);border-radius:18px;padding:18px;margin-bottom:16px;text-align:center;">
+        <div style="font-size:36px;margin-bottom:8px;">${info.icon}</div>
+        <div style="color:#fff;font-size:16px;font-weight:500;margin-bottom:4px;">${info.name}</div>
+        <div style="color:var(--muted);font-size:11px;">Día ${day} de ${len}</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px;">
+        <div style="color:var(--g1);font-size:11px;font-weight:500;margin-bottom:8px;">Estado de tu piel ahora</div>
+        <div style="color:rgba(255,255,255,0.7);font-size:12px;line-height:1.6;">${info.skin}</div>
+      </div>
+      <div style="color:#fff;font-size:13px;font-weight:500;margin-bottom:10px;">Qué hacer esta semana</div>
+      ${info.tips.map(t => `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--g1);">•</span><span style="color:rgba(255,255,255,0.7);font-size:12px;line-height:1.5;">${t}</span></div>`).join('')}
+      <button onclick="document.getElementById('hormonal-form').style.display='block';document.getElementById('hormonal-result').style.display='none';" style="width:100%;margin-top:14px;background:rgba(255,255,255,0.06);color:#fff;border:1px solid var(--border);border-radius:14px;padding:13px;font-size:13px;cursor:pointer;">Analizar otro día del ciclo</button>
+    `;
   }
 
   /* SERVICE WORKER */
