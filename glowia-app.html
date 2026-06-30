@@ -910,6 +910,7 @@
       isAdmin = true;
       document.getElementById('admin-banner').style.display = 'block';
       document.getElementById('home-greeting').textContent = 'Hola, Administradora ✨';
+      applyAdminAccess();
       showScreen('screen-home'); return;
     }
     isAdmin = false;
@@ -999,6 +1000,41 @@
     document.getElementById('stat-total').textContent   = users.length;
     document.getElementById('stat-active').textContent  = active;
     document.getElementById('stat-revoked').textContent = revoked;
+  }
+
+  function applyAdminAccess() {
+    // Reemplaza todas las etiquetas Pro/Ultra por insignia de dueña
+    document.querySelectorAll('.feature-tag').forEach(el => {
+      if (el.textContent.trim() === 'Pro' || el.textContent.trim() === 'Ultra') {
+        el.textContent = '✓ Desbloqueado';
+        el.style.background = 'rgba(50,220,130,0.1)';
+        el.style.color = 'var(--success)';
+      }
+    });
+    // Etiquetas en servicios
+    document.querySelectorAll('.service-tag').forEach(el => {
+      if (el.textContent.includes('Pro') || el.textContent.includes('Ultra')) {
+        el.textContent = '✓ Incluido';
+        el.style.background = 'rgba(50,220,130,0.1)';
+        el.style.color = 'var(--success)';
+      }
+    });
+    // Ocultar badges Pro/Ultra en esquinas de service cards
+    document.querySelectorAll('.pro-badge').forEach(el => { el.style.display = 'none'; });
+    // Ocultar el banner promo que invita a comprar
+    const promo = document.querySelector('.promo-banner');
+    if (promo) {
+      promo.style.background = 'linear-gradient(135deg,rgba(50,220,130,0.08),rgba(50,220,130,0.03))';
+      promo.style.borderColor = 'rgba(50,220,130,0.2)';
+      promo.querySelector('.promo-gold').textContent = 'Acceso completo de administradora';
+      promo.querySelector('.promo-gold').style.color = 'var(--success)';
+      promo.querySelector('.promo-title').textContent = 'Tienes todos los servicios Glowia desbloqueados';
+      const cta = promo.querySelector('.promo-cta');
+      if (cta) cta.style.display = 'none';
+    }
+    // Ocultar botón de upgrade en resultados
+    const upgradeBtn = document.querySelector('#screen-results .btn-secondary');
+    if (upgradeBtn) upgradeBtn.style.display = 'none';
   }
 
   /* CAMARA */
