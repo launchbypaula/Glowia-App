@@ -307,6 +307,7 @@
         <div class="admin-badge-wrap"><i class="ti ti-shield-check" style="font-size:12px;"></i>Administradora</div>
         <div style="color:#fff;font-size:20px;font-weight:500;">Control de accesos</div>
         <div style="color:var(--muted);font-size:11px;margin-top:3px;">ellaevoluciona.s@gmail.com</div>
+        <button onclick="showScreen('screen-config')" style="margin-top:12px;display:flex;align-items:center;gap:8px;background:rgba(255,154,108,0.1);border:1px solid rgba(255,154,108,0.3);border-radius:12px;padding:10px 14px;color:var(--g1);font-size:12px;cursor:pointer;"><i class="ti ti-brain" style="font-size:14px;"></i>Configurar IA (Dra. Glowia)</button>
       </div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-number" id="stat-total">0</div><div class="stat-label">Total usuarios</div></div>
@@ -883,6 +884,30 @@
     </div>
   </div>
 
+  <!-- CONFIGURACION ADMIN -->
+  <div id="screen-config" class="screen" style="background:var(--dark);">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-admin')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Configuración IA</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div style="padding:24px 20px;">
+      <div style="background:rgba(255,210,125,0.08);border:1px solid rgba(255,210,125,0.25);border-radius:16px;padding:16px;margin-bottom:24px;">
+        <div style="color:var(--gold);font-size:12px;font-weight:500;margin-bottom:6px;">🔐 Solo tú ves esto</div>
+        <div style="color:rgba(255,255,255,0.6);font-size:11px;line-height:1.6;">Tu clave se guarda solo en este dispositivo. Nunca se sube al código ni es visible para nadie más.</div>
+      </div>
+      <div style="color:#fff;font-size:13px;font-weight:500;margin-bottom:8px;">Clave API de Anthropic</div>
+      <input id="api-key-input" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px 16px;color:#fff;font-size:13px;outline:none;margin-bottom:10px;font-family:monospace;"/>
+      <button onclick="saveApiKey()" style="width:100%;background:linear-gradient(135deg,var(--g1),var(--pink));color:#fff;border:none;border-radius:14px;padding:15px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:10px;">Guardar clave</button>
+      <div id="key-status" style="text-align:center;font-size:12px;color:var(--muted);"></div>
+      <div style="margin-top:20px;background:rgba(255,255,255,0.04);border-radius:14px;padding:14px;">
+        <div style="color:rgba(255,255,255,0.5);font-size:11px;line-height:1.7;">Estado actual: <span id="key-state" style="color:var(--success);"></span></div>
+      </div>
+    </div>
+  </div>
+
   <!-- SCANNER DE INGREDIENTES -->
   <div id="screen-ingredients" class="screen" style="background:var(--dark);">
     <div class="status-bar">
@@ -1057,6 +1082,18 @@
   let isAdmin = false;
   let users = [];
 
+  function saveApiKey() {
+    const key = document.getElementById('api-key-input').value.trim();
+    const status = document.getElementById('key-status');
+    if (!key.startsWith('sk-ant-')) { status.textContent = 'Clave inválida. Debe empezar con sk-ant-'; status.style.color = '#ff9999'; return; }
+    localStorage.setItem('glowia_api_key', key);
+    CLAUDE_KEY = key;
+    status.textContent = '✓ Clave guardada correctamente';
+    status.style.color = 'var(--success)';
+    document.getElementById('key-state').textContent = '✓ Clave configurada';
+    setTimeout(() => showScreen('screen-admin'), 1500);
+  }
+
   function handleServiceClick(screen) {
     if (isAdmin) { showScreen(screen); return; }
     showScreen('screen-plans');
@@ -1065,8 +1102,15 @@
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    if (id === 'screen-admin') { renderUsers(); updateStats(); }
-    if (id === 'screen-scan')  { initCamera(); }
+    if (id === 'screen-admin')  { renderUsers(); updateStats(); }
+    if (id === 'screen-scan')   { initCamera(); }
+    if (id === 'screen-config') {
+      const saved = localStorage.getItem('glowia_api_key') || '';
+      document.getElementById('api-key-input').value = saved;
+      document.getElementById('key-state').textContent = saved ? '✓ Clave configurada' : 'Sin clave — la IA no responderá';
+      document.getElementById('key-state').style.color = saved ? 'var(--success)' : '#ff9999';
+      document.getElementById('key-status').textContent = '';
+    }
   }
 
   function showScreenDirect(id) {
@@ -1418,23 +1462,54 @@
     document.getElementById('ingredients-result').style.display = 'block';
   }
 
-  /* CHAT DERMATOLOGA */
-  const chatResponses = {
-    'acné':       'El acné hormonal en adultas suele concentrarse en la zona del mentón y mandíbula. Te recomiendo: ácido salicílico 2% para limpiar poros, niacinamida 10% para reducir inflamación y peróxido de benzoilo 2.5% puntual en granitos activos. Evita tocarlos y cambia tu funda de almohada cada 3 días.',
-    'piel seca':  'Para piel seca, la clave está en una rutina que no agote la barrera. Limpiador sin sulfatos, sérum de ácido hialurónico en piel húmeda, crema con ceramidas y aceite facial de noche (rosa mosqueta o escualano). Hidrata desde adentro con mínimo 2 litros de agua.',
-    'manchas':    'Las manchas oscuras o hiperpigmentación responden bien a: vitamina C en la mañana (protege y aclara), niacinamida que inhibe la melanina, AHA o ácido glicólico 3x/semana de noche para renovar. Protector solar SPF 50+ es OBLIGATORIO — sin él, cualquier tratamiento es inútil.',
-    'poros':      'Los poros dilatados no se "cierran" pero sí se minimizan. Usa ácido salicílico 1-2% para limpiarlos desde adentro, niacinamida para afinar la textura, y arcilla 1-2 veces por semana como mascarilla. Evita extractores manuales que los agrandan.',
-    'default':    'Entiendo tu preocupación. Para darte la orientación más precisa, te recomiendo hacer el escaneo facial Glowia IA — así puedo analizar tu piel en detalle y personalizar la respuesta. ¿Hay algo específico que notes en tu piel últimamente?'
-  };
+  /* CHAT DERMATOLOGA — conectado a Claude IA */
+  let CLAUDE_KEY = localStorage.getItem('glowia_api_key') || '';
+  const CLAUDE_SYSTEM = `Eres la Dra. Glowia IA, dermatóloga virtual experta en cuidado de la piel dentro de la app Glowia.
+Respondes en español, de manera cálida, empática y profesional.
+Das consejos prácticos y específicos sobre skincare, ingredientes, rutinas y preocupaciones cutáneas.
+Tus respuestas son concisas (máximo 4 oraciones), directas y útiles.
+Si la pregunta es muy médica o grave, recomiendas consultar un dermatólogo presencial.
+Nunca dices que eres una IA de Anthropic — eres la Dra. Glowia IA exclusivamente.`;
+
+  let chatHistory = [];
+
+  async function callClaude(userMsg) {
+    CLAUDE_KEY = localStorage.getItem('glowia_api_key') || CLAUDE_KEY;
+    if (!CLAUDE_KEY) throw new Error('Sin clave API. Configúrala en el panel admin → Configurar IA.');
+    chatHistory.push({ role: 'user', content: userMsg });
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 350,
+        system: CLAUDE_SYSTEM,
+        messages: chatHistory
+      })
+    });
+    const data = await resp.json();
+    const reply = data.content && data.content[0] ? data.content[0].text : 'Lo siento, hubo un problema. Intenta de nuevo.';
+    chatHistory.push({ role: 'assistant', content: reply });
+    return reply;
+  }
 
   function sendQuickMsg(btn) {
     const msg = btn.textContent;
     btn.parentElement.style.display = 'none';
     appendChatMsg(msg, 'user');
-    setTimeout(() => {
-      const key = Object.keys(chatResponses).find(k => msg.toLowerCase().includes(k)) || 'default';
-      appendChatMsg(chatResponses[key], 'bot');
-    }, 800);
+    const loadId = appendChatMsg('...', 'bot', true);
+    callClaude(msg).then(reply => {
+      const el = document.getElementById(loadId);
+      if (el) el.textContent = reply;
+    }).catch(() => {
+      const el = document.getElementById(loadId);
+      if (el) el.textContent = 'Hubo un problema de conexión. Intenta de nuevo.';
+    });
   }
 
   function sendChat() {
@@ -1443,22 +1518,29 @@
     if (!msg) return;
     input.value = '';
     appendChatMsg(msg, 'user');
-    setTimeout(() => {
-      const key = Object.keys(chatResponses).find(k => msg.toLowerCase().includes(k)) || 'default';
-      appendChatMsg(chatResponses[key], 'bot');
-    }, 900);
+    const loadId = appendChatMsg('Escribiendo...', 'bot', true);
+    callClaude(msg).then(reply => {
+      const el = document.getElementById(loadId);
+      if (el) el.textContent = reply;
+    }).catch(() => {
+      const el = document.getElementById(loadId);
+      if (el) el.textContent = 'Hubo un problema de conexión. Intenta de nuevo.';
+    });
   }
 
-  function appendChatMsg(text, from) {
+  let msgIdCounter = 0;
+  function appendChatMsg(text, from, isLoading) {
     const msgs = document.getElementById('chat-messages');
     const div  = document.createElement('div');
+    const id   = 'msg-' + (++msgIdCounter);
     div.style.cssText = 'display:flex;gap:10px;align-items:flex-start;' + (from==='user' ? 'flex-direction:row-reverse;' : '');
     div.innerHTML = from === 'bot'
       ? `<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--g1),var(--pink));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">👩‍⚕️</div>
-         <div style="background:var(--card);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:12px 14px;max-width:80%;"><div style="color:#fff;font-size:12px;line-height:1.6;">${text}</div></div>`
+         <div style="background:var(--card);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:12px 14px;max-width:80%;"><div id="${id}" style="color:${isLoading ? 'rgba(255,255,255,0.4)' : '#fff'};font-size:12px;line-height:1.6;">${text}</div></div>`
       : `<div style="background:linear-gradient(135deg,var(--g1),var(--pink));border-radius:16px 16px 4px 16px;padding:12px 14px;max-width:80%;"><div style="color:#fff;font-size:12px;line-height:1.6;">${text}</div></div>`;
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
+    return id;
   }
 
   /* HORMONAL */
