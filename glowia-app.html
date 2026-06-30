@@ -1498,18 +1498,25 @@ Nunca dices que eres una IA de Anthropic — eres la Dra. Glowia IA exclusivamen
     return reply;
   }
 
+  function handleChatError(loadId, err) {
+    const el = document.getElementById(loadId);
+    if (!el) return;
+    const noKey = !localStorage.getItem('glowia_api_key');
+    el.innerHTML = noKey
+      ? '⚠️ Clave API no configurada. Ve al Panel de Admin → Configurar IA y guarda tu clave de Anthropic.'
+      : 'Hubo un error de conexión. Intenta de nuevo en unos segundos.';
+    el.style.color = '#ffb3b3';
+  }
+
   function sendQuickMsg(btn) {
     const msg = btn.textContent;
     btn.parentElement.style.display = 'none';
     appendChatMsg(msg, 'user');
-    const loadId = appendChatMsg('...', 'bot', true);
+    const loadId = appendChatMsg('Escribiendo...', 'bot', true);
     callClaude(msg).then(reply => {
       const el = document.getElementById(loadId);
-      if (el) el.textContent = reply;
-    }).catch(() => {
-      const el = document.getElementById(loadId);
-      if (el) el.textContent = 'Hubo un problema de conexión. Intenta de nuevo.';
-    });
+      if (el) { el.textContent = reply; el.style.color = '#fff'; }
+    }).catch(err => handleChatError(loadId, err));
   }
 
   function sendChat() {
@@ -1521,11 +1528,8 @@ Nunca dices que eres una IA de Anthropic — eres la Dra. Glowia IA exclusivamen
     const loadId = appendChatMsg('Escribiendo...', 'bot', true);
     callClaude(msg).then(reply => {
       const el = document.getElementById(loadId);
-      if (el) el.textContent = reply;
-    }).catch(() => {
-      const el = document.getElementById(loadId);
-      if (el) el.textContent = 'Hubo un problema de conexión. Intenta de nuevo.';
-    });
+      if (el) { el.textContent = reply; el.style.color = '#fff'; }
+    }).catch(err => handleChatError(loadId, err));
   }
 
   let msgIdCounter = 0;
