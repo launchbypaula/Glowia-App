@@ -58,7 +58,9 @@
     .screen { width: 100%; min-height: 844px; display: none; flex-direction: column; }
     .screen.active { display: flex; }
 
-    .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px 4px; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 8px; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .bat, .bat-fill, .ti-wifi { display: none !important; }
+    .status-bar > span:first-child { display: none; }
 
     .bat { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.4); border-radius: 3px; display: flex; align-items: center; padding: 1.5px; position: relative; }
     .bat::after { content: ''; width: 2px; height: 6px; background: rgba(255,255,255,0.4); position: absolute; right: -5px; border-radius: 0 2px 2px 0; }
