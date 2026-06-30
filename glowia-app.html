@@ -256,8 +256,9 @@
         <div class="login-subtitle">Tu piel. Tu IA. Tu rutina.</div>
       </div>
       <div style="width:100%;">
-        <div id="login-error" class="login-error">Email no registrado. Contacta a la administradora.</div>
+        <div id="login-error" class="login-error">Email o contraseña incorrectos.</div>
         <input class="form-input" id="login-email" type="email" placeholder="tu@email.com"/>
+        <input class="form-input" id="login-password" type="password" placeholder="Contraseña"/>
         <button class="login-cta" onclick="tryLogin()">Ingresar</button>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
           <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
@@ -883,6 +884,7 @@
 
 <script>
   const ADMIN_EMAIL = 'ellaevoluciona.s@gmail.com';
+  const ADMIN_PASS  = 'Glowia2024';
   let isAdmin = false;
   let users = [];
 
@@ -901,16 +903,20 @@
 
   function tryLogin() {
     const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const pass  = document.getElementById('login-password').value;
     const err   = document.getElementById('login-error');
     err.classList.remove('show');
     if (!email) { err.classList.add('show'); return; }
+
     if (email === ADMIN_EMAIL.toLowerCase()) {
+      if (pass !== ADMIN_PASS) { err.textContent = 'Contraseña incorrecta.'; err.classList.add('show'); return; }
       isAdmin = true;
       document.getElementById('admin-banner').style.display = 'block';
       document.getElementById('home-greeting').textContent = 'Hola, Administradora ✨';
       applyAdminAccess();
       showScreen('screen-home'); return;
     }
+
     isAdmin = false;
     document.getElementById('admin-banner').style.display = 'none';
     const found = users.find(u => u.email.toLowerCase() === email && u.status === 'active');
@@ -919,6 +925,7 @@
       document.getElementById('home-greeting').textContent = 'Hola, ' + nombre + ' ✨';
       showScreen('screen-home');
     } else {
+      err.textContent = 'Email no registrado. Contacta a la administradora.';
       err.classList.add('show');
     }
   }
@@ -1001,7 +1008,7 @@
   }
 
   function applyAdminAccess() {
-    // Reemplaza todas las etiquetas Pro/Ultra por insignia de dueña
+    // Etiquetas Pro/Ultra → Desbloqueado
     document.querySelectorAll('.feature-tag').forEach(el => {
       if (el.textContent.trim() === 'Pro' || el.textContent.trim() === 'Ultra') {
         el.textContent = '✓ Desbloqueado';
@@ -1009,7 +1016,6 @@
         el.style.color = 'var(--success)';
       }
     });
-    // Etiquetas en servicios
     document.querySelectorAll('.service-tag').forEach(el => {
       if (el.textContent.includes('Pro') || el.textContent.includes('Ultra')) {
         el.textContent = '✓ Incluido';
@@ -1017,22 +1023,40 @@
         el.style.color = 'var(--success)';
       }
     });
-    // Ocultar badges Pro/Ultra en esquinas de service cards
+    // Ocultar badges dorados en esquinas
     document.querySelectorAll('.pro-badge').forEach(el => { el.style.display = 'none'; });
-    // Ocultar el banner promo que invita a comprar
+
+    // Feature cards: redirigir Pro/Ultra a servicios en lugar de planes
+    const featureCards = document.querySelectorAll('.feature-card');
+    featureCards.forEach(card => {
+      const tag = card.querySelector('.feature-tag');
+      if (tag && (tag.textContent.includes('Desbloqueado'))) {
+        card.onclick = () => showScreen('screen-services');
+      }
+    });
+
+    // Banner promo → mensaje de bienvenida para admin
     const promo = document.querySelector('.promo-banner');
     if (promo) {
       promo.style.background = 'linear-gradient(135deg,rgba(50,220,130,0.08),rgba(50,220,130,0.03))';
       promo.style.borderColor = 'rgba(50,220,130,0.2)';
-      promo.querySelector('.promo-gold').textContent = 'Acceso completo de administradora';
-      promo.querySelector('.promo-gold').style.color = 'var(--success)';
-      promo.querySelector('.promo-title').textContent = 'Tienes todos los servicios Glowia desbloqueados';
+      const gold = promo.querySelector('.promo-gold');
+      if (gold) { gold.textContent = 'Acceso completo — Administradora'; gold.style.color = 'var(--success)'; }
+      const title = promo.querySelector('.promo-title');
+      if (title) title.textContent = 'Tienes todos los servicios Glowia desbloqueados';
+      const tags = promo.querySelector('.promo-tags');
+      if (tags) tags.style.display = 'none';
       const cta = promo.querySelector('.promo-cta');
       if (cta) cta.style.display = 'none';
+      promo.onclick = null;
     }
-    // Ocultar botón de upgrade en resultados
-    const upgradeBtn = document.querySelector('#screen-results .btn-secondary');
-    if (upgradeBtn) upgradeBtn.style.display = 'none';
+
+    // Ocultar botón de upgrade en resultados y rutina
+    document.querySelectorAll('#screen-results .btn-secondary, #screen-routine .btn-secondary').forEach(el => { el.style.display = 'none'; });
+
+    // Ocultar botón "Ver planes" en servicios, reemplazar por texto
+    const planBtn = document.querySelector('#screen-services .btn-primary');
+    if (planBtn) planBtn.style.display = 'none';
   }
 
   /* CAMARA */
