@@ -1,0 +1,1685 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Glowia â€“ AI Skin Care Assistant</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --g1: #ff9a6c;
+      --pink: #ff6e91;
+      --dark: #0f0a0e;
+      --card: #1e1520;
+      --muted: rgba(255,255,255,0.45);
+      --muted2: rgba(255,255,255,0.2);
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,150,100,0.25);
+      --gold: #ffd27d;
+      --success: #32dc82;
+      --danger: #ff5555;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0608;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ===== PHONE FRAME ===== */
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: var(--dark);
+      border-radius: 50px;
+      border: 2px solid #2e2030;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    }
+
+    /* ===== RESPONSIVE: MOBILE FULLSCREEN ===== */
+    @media (max-width: 480px) {
+      body {
+        align-items: flex-start;
+        justify-content: flex-start;
+        background: #0f0a0e;
+        padding: 0;
+      }
+      .phone {
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+      }
+      .screen {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+    }
+
+    .screen {
+      width: 100%;
+      min-height: 844px;
+      display: none;
+      flex-direction: column;
+    }
+    .screen.active { display: flex; }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 24px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .bat {
+      width: 22px; height: 11px;
+      border: 1.5px solid rgba(255,255,255,0.4);
+      border-radius: 3px;
+      display: flex; align-items: center; padding: 1.5px;
+      position: relative;
+    }
+    .bat::after {
+      content: '';
+      width: 2px; height: 6px;
+      background: rgba(255,255,255,0.4);
+      position: absolute; right: -5px;
+      border-radius: 0 2px 2px 0;
+    }
+    .bat-fill { background: #1A1A1A; height: 100%; width: 75%; border-radius: 1px; }
+
+    .back-btn {
+      background: none; border: none;
+      color: var(--muted); font-size: 22px;
+      cursor: pointer; padding: 4px;
+    }
+
+    /* ===== LOGO ===== */
+    .logo-circle {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff8c50, #ff5535);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .logo-circle::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      background: rgba(255,100,145,0.3);
+    }
+    .logo-g {
+      font-family: Georgia, serif;
+      font-size: 30px; font-weight: 700;
+      color: #fff; position: relative; z-index: 1;
+    }
+    .logo-sparkle {
+      font-size: 12px;
+      position: absolute; top: -4px; right: -5px; z-index: 2;
+    }
+    .logo-rings {
+      position: relative;
+      width: 88px; height: 88px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-rings::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255,154,108,0.2);
+    }
+    .logo-rings::after {
+      content: '';
+      position: absolute; inset: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,154,108,0.3);
+    }
+
+    /* ===== NAV ===== */
+    .nav-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0 28px;
+      background: rgba(15,10,14,0.97);
+      border-top: 0.5px solid rgba(255,255,255,0.07);
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+    .nav-item {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      cursor: pointer; border: none; background: none; padding: 0 10px;
+    }
+    .nav-item i { font-size: 22px; color: rgba(255,255,255,0.28); }
+    .nav-item span { font-size: 9px; color: rgba(255,255,255,0.28); }
+    .nav-item.active i { color: var(--g1); }
+    .nav-item.active span { color: var(--g1); }
+
+    /* ===== SCROLL CONTAINER ===== */
+    .scroll-view { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+
+    /* ===== GRADIENT BUTTON ===== */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--g1), var(--pink));
+      color: #fff !important; border: none; border-radius: 14px;
+      padding: 16px; font-size: 15px; font-weight: 500;
+      cursor: pointer; width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-secondary {
+      background: none;
+      border: 1px solid rgba(255,154,108,0.3);
+      color: var(--g1); border-radius: 14px;
+      padding: 13px; font-size: 13px;
+      cursor: pointer; width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    /* ===== SECTION TITLE ===== */
+    .sec-label {
+      color: rgba(255,255,255,0.4);
+      font-size: 11px; letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0 20px 10px;
+    }
+
+    /* ===================================
+       SCREEN 0 â€” LOGIN
+    =================================== */
+    #screen-login {
+      background: var(--dark);
+      align-items: center; justify-content: center;
+    }
+    .login-box { width: 100%; padding: 0 32px; }
+    .login-title {
+      color: #fff; font-size: 24px; font-weight: 500;
+      text-align: center; margin-bottom: 6px;
+      font-family: Georgia, serif;
+    }
+    .login-subtitle {
+      color: var(--muted); font-size: 12px;
+      text-align: center; margin-bottom: 32px;
+    }
+    .form-input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px; padding: 15px 16px;
+      color: #fff; font-size: 14px;
+      margin-bottom: 12px; outline: none;
+    }
+    .form-input::placeholder { color: rgba(255,255,255,0.3); }
+    .form-input:focus { border-color: rgba(255,154,108,0.5); }
+    .login-cta {
+      width: 100%;
+      background: linear-gradient(135deg, var(--g1), var(--pink));
+      color: #fff; border: none; border-radius: 14px;
+      padding: 16px; font-size: 15px; font-weight: 500;
+      cursor: pointer; margin-top: 4px;
+    }
+    .login-hint {
+      color: var(--muted); font-size: 11px;
+      text-align: center; margin-top: 18px; line-height: 1.6;
+    }
+    .login-hint span { color: var(--g1); cursor: pointer; text-decoration: underline; }
+    .login-error {
+      background: rgba(255,85,85,0.1);
+      border: 1px solid rgba(255,85,85,0.25);
+      border-radius: 12px; padding: 12px 14px;
+      color: #ff9999; font-size: 12px;
+      text-align: center; margin-bottom: 14px;
+      display: none; line-height: 1.5;
+    }
+    .login-error.show { display: block; }
+    .login-badges {
+      display: flex; gap: 10px;
+      justify-content: center; margin-top: 28px;
+    }
+    .login-badge {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 10px; color: var(--muted);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .login-badge i { font-size: 12px; color: var(--g1); }
+
+    /* ===================================
+       SCREEN 1 â€” ACCESO PENDIENTE
+    =================================== */
+    #screen-pending {
+      background: var(--dark);
+      align-items: center; justify-content: center;
+      padding: 32px;
+    }
+    .pending-icon { font-size: 56px; margin-bottom: 20px; text-align: center; }
+    .pending-title {
+      color: #fff; font-size: 22px; font-weight: 500;
+      text-align: center; margin-bottom: 10px;
+    }
+    .pending-sub {
+      color: var(--muted); font-size: 12px;
+      text-align: center; line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .pending-email-box {
+      background: rgba(255,154,108,0.1);
+      border: 1px solid rgba(255,154,108,0.25);
+      border-radius: 12px; padding: 10px 20px;
+      color: var(--g1); font-size: 12px;
+      margin-bottom: 28px;
+    }
+    .pending-steps {
+      width: 100%; display: flex;
+      flex-direction: column; gap: 12px;
+      margin-bottom: 28px;
+    }
+    .pending-step {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 14px;
+    }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(255,154,108,0.15);
+      color: var(--g1); font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-weight: 600;
+    }
+    .step-text { color: rgba(255,255,255,0.55); font-size: 11px; line-height: 1.6; }
+    .back-link {
+      color: var(--muted); font-size: 12px;
+      cursor: pointer; border: none; background: none;
+      text-decoration: underline; margin-top: 8px;
+    }
+
+    /* ===================================
+       SCREEN 2 â€” ADMIN PANEL
+    =================================== */
+    #screen-admin { background: var(--dark); }
+    .admin-header { padding: 12px 20px 16px; }
+    .admin-badge-wrap {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,210,125,0.12);
+      border: 1px solid rgba(255,210,125,0.3);
+      border-radius: 20px; padding: 5px 12px;
+      font-size: 10px; color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .admin-title { color: #fff; font-size: 20px; font-weight: 500; }
+    .admin-email-lbl { color: var(--muted); font-size: 11px; margin-top: 3px; }
+
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px; padding: 0 20px 16px;
+    }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px; text-align: center;
+    }
+    .stat-number { font-size: 26px; font-weight: 500; color: #fff; }
+    .stat-label { color: var(--muted); font-size: 9px; margin-top: 3px; }
+
+    .add-user-section { padding: 0 20px 16px; }
+    .add-user-title {
+      color: #fff; font-size: 13px; font-weight: 500;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .add-row { display: flex; gap: 8px; }
+    .admin-input {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px; padding: 12px 14px;
+      color: #fff; font-size: 12px; outline: none;
+    }
+    .admin-input::placeholder { color: rgba(255,255,255,0.3); }
+    .admin-input:focus { border-color: rgba(255,154,108,0.5); }
+    .add-btn {
+      background: linear-gradient(135deg, var(--g1), var(--pink));
+      color: #fff; border: none; border-radius: 12px;
+      padding: 12px 16px; font-size: 12px; font-weight: 500;
+      cursor: pointer; white-space: nowrap;
+    }
+    .msg-success {
+      background: rgba(50,220,130,0.1);
+      border: 1px solid rgba(50,220,130,0.2);
+      border-radius: 10px; padding: 8px 12px;
+      color: var(--success); font-size: 11px;
+      margin-top: 8px; display: none;
+    }
+    .msg-error {
+      background: rgba(255,85,85,0.1);
+      border: 1px solid rgba(255,85,85,0.2);
+      border-radius: 10px; padding: 8px 12px;
+      color: #ff9999; font-size: 11px;
+      margin-top: 8px; display: none;
+    }
+    .msg-success.show, .msg-error.show { display: block; }
+
+    .search-section { padding: 0 20px 10px; }
+    .search-wrap { position: relative; }
+    .search-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px; padding: 10px 14px 10px 38px;
+      color: #fff; font-size: 12px; outline: none;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.3); }
+    .search-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.3); font-size: 16px;
+      pointer-events: none;
+    }
+
+    .users-section { padding: 0 20px; }
+    .users-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 10px;
+    }
+    .users-title { color: #fff; font-size: 13px; font-weight: 500; }
+    .users-count { color: var(--muted); font-size: 10px; }
+
+    .filter-tabs {
+      display: flex; gap: 6px; margin-bottom: 12px;
+    }
+    .filter-tab {
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 10px; border: 1px solid var(--border);
+      background: none; color: var(--muted); cursor: pointer;
+    }
+    .filter-tab.active {
+      background: rgba(255,154,108,0.15);
+      border-color: rgba(255,154,108,0.4);
+      color: var(--g1);
+    }
+
+    .user-list { display: flex; flex-direction: column; gap: 8px; }
+    .user-row {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 14px;
+    }
+    .user-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; flex-shrink: 0;
+    }
+    .user-email {
+      color: #fff; font-size: 11px; font-weight: 500;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      max-width: 140px;
+    }
+    .user-date { color: var(--muted); font-size: 9px; margin-top: 2px; }
+    .user-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .status-badge { font-size: 9px; padding: 3px 8px; border-radius: 10px; }
+    .status-active { background: rgba(50,220,130,0.1); color: var(--success); }
+    .status-revoked { background: rgba(255,85,85,0.1); color: #ff9999; }
+    .revoke-btn {
+      background: none;
+      border: 1px solid rgba(255,85,85,0.25);
+      border-radius: 8px; padding: 4px 9px;
+      font-size: 9px; color: #ff9999; cursor: pointer;
+    }
+    .revoke-btn:hover { background: rgba(255,85,85,0.1); }
+    .restore-btn {
+      background: none;
+      border: 1px solid rgba(50,220,130,0.25);
+      border-radius: 8px; padding: 4px 9px;
+      font-size: 9px; color: var(--success); cursor: pointer;
+    }
+
+    /* ===================================
+       SCREEN 3 â€” HOME
+    =================================== */
+    #screen-home { background: var(--dark); }
+    .home-header {
+      padding: 10px 20px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .home-name { color: #fff; font-size: 20px; font-weight: 500; }
+    .home-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .notif-btn {
+      width: 40px; height: 40px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 50%; display: flex;
+      align-items: center; justify-content: center;
+      color: #fff; font-size: 18px; cursor: pointer;
+      position: relative;
+    }
+    .notif-dot {
+      position: absolute; top: 3px; right: 3px;
+      width: 8px; height: 8px;
+      background: var(--g1); border-radius: 50%;
+      border: 2px solid var(--dark);
+    }
+
+    .score-card {
+      margin: 0 20px 16px;
+      background: linear-gradient(135deg, #2a1828, #1e1020);
+      border: 1px solid rgba(255,154,108,0.2);
+      border-radius: 24px; padding: 20px;
+      position: relative; overflow: hidden; cursor: pointer;
+    }
+    .score-card::before {
+      content: '';
+      position: absolute; top: -40px; right: -40px;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(255,154,108,0.15), transparent 70%);
+      border-radius: 50%;
+    }
+    .score-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 16px;
+    }
+    .score-label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+    .score-number {
+      font-size: 52px; font-weight: 500; color: #fff;
+      line-height: 1; display: flex; align-items: flex-end; gap: 5px;
+    }
+    .score-number span { font-size: 16px; color: var(--muted); font-weight: 400; padding-bottom: 8px; }
+    .trend-badge {
+      background: rgba(50,220,130,0.12);
+      border: 1px solid rgba(50,220,130,0.25);
+      border-radius: 20px; padding: 5px 12px;
+      font-size: 11px; color: var(--success);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .score-bars { display: flex; gap: 8px; }
+    .sbar { flex: 1; }
+    .sbar-name { color: var(--muted); font-size: 10px; margin-bottom: 5px; }
+    .sbar-track { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+    .sbar-fill { height: 100%; border-radius: 2px; }
+    .sbar-val { color: rgba(255,255,255,0.6); font-size: 10px; margin-top: 4px; }
+
+    .streak-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+      margin: 0 20px 16px;
+    }
+    .streak-num { font-size: 32px; font-weight: 500; color: var(--g1); }
+    .streak-label { color: #fff; font-size: 13px; font-weight: 500; }
+    .streak-sub { color: var(--muted); font-size: 10px; margin-top: 2px; }
+    .streak-days { display: flex; gap: 6px; margin-left: auto; }
+    .streak-day {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: var(--muted);
+    }
+    .streak-day.done { background: rgba(255,154,108,0.2); color: var(--g1); }
+
+    .section-header {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 0 20px; margin-bottom: 12px;
+    }
+    .section-title { color: #fff; font-size: 15px; font-weight: 500; }
+    .section-link { color: var(--g1); font-size: 12px; background: none; border: none; cursor: pointer; }
+
+    .features-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; padding: 0 20px; margin-bottom: 16px;
+    }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 16px; cursor: pointer;
+    }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 12px;
+    }
+    .feature-name { color: #fff; font-size: 12px; font-weight: 500; margin-bottom: 3px; }
+    .feature-desc { color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .feature-tag {
+      display: inline-block; margin-top: 8px;
+      font-size: 9px; padding: 3px 9px; border-radius: 12px;
+    }
+
+    .promo-banner {
+      margin: 0 20px 20px;
+      background: linear-gradient(135deg, #2a1828, #1e1020);
+      border: 1px solid rgba(255,154,108,0.25);
+      border-radius: 20px; padding: 18px;
+      cursor: pointer; position: relative; overflow: hidden;
+    }
+    .promo-banner::before {
+      content: '';
+      position: absolute; top: -25px; right: -25px;
+      width: 90px; height: 90px;
+      background: radial-gradient(circle, rgba(255,154,108,0.2), transparent);
+      border-radius: 50%;
+    }
+    .promo-gold { color: var(--gold); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+    .promo-title { color: #fff; font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+    .promo-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+    .promo-tag { background: rgba(255,255,255,0.07); border-radius: 20px; padding: 4px 10px; font-size: 10px; color: rgba(255,255,255,0.55); }
+    .promo-cta {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: linear-gradient(135deg, var(--g1), var(--pink));
+      border-radius: 20px; padding: 9px 18px;
+      font-size: 12px; color: #fff; font-weight: 500; border: none; cursor: pointer;
+    }
+
+    /* ===================================
+       SCREEN 4 â€” SCAN
+    =================================== */
+    #screen-scan { background: #000; }
+    .cam-area {
+      flex: 1;
+      background: radial-gradient(ellipse at 50% 40%, #1a0e18 0%, #050306 100%);
+      position: relative; display: flex;
+      align-items: center; justify-content: center; overflow: hidden;
+    }
+    .cam-grid {
+      position: absolute; inset: 0; opacity: 0.08;
+    }
+    .face-oval {
+      width: 200px; height: 250px; border-radius: 50%;
+      border: 2px solid rgba(255,154,108,0.6);
+      position: absolute; overflow: hidden;
+    }
+    .scan-line {
+      position: absolute; left: -5%; right: -5%; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,154,108,0.9), transparent);
+      top: 0;
+      animation: scanAnim 2.2s ease-in-out infinite;
+    }
+    @keyframes scanAnim {
+      0%   { top: 0; opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .cam-corner { position: absolute; width: 22px; height: 22px; }
+    .cam-tl { top: 60px; left: 20px; border-top: 2px solid var(--g1); border-left: 2px solid var(--g1); border-radius: 4px 0 0 0; }
+    .cam-tr { top: 60px; right: 20px; border-top: 2px solid var(--g1); border-right: 2px solid var(--g1); border-radius: 0 4px 0 0; }
+    .cam-bl { bottom: 0; left: 20px; border-bottom: 2px solid var(--g1); border-left: 2px solid var(--g1); border-radius: 0 0 0 4px; }
+    .cam-br { bottom: 0; right: 20px; border-bottom: 2px solid var(--g1); border-right: 2px solid var(--g1); border-radius: 0 0 4px 0; }
+    .ai-badge-cam {
+      position: absolute; top: 52px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,154,108,0.15);
+      border: 1px solid rgba(255,154,108,0.35);
+      border-radius: 20px; padding: 5px 16px; white-space: nowrap;
+    }
+    .ai-badge-cam span { color: var(--g1); font-size: 11px; }
+    .ai-dots { position: absolute; inset: 0; pointer-events: none; }
+    .cam-controls {
+      background: rgba(10,5,10,0.88);
+      padding: 18px 24px 32px; flex-shrink: 0;
+    }
+    .scan-status { color: rgba(255,255,255,0.65); font-size: 13px; text-align: center; margin-bottom: 12px; }
+    .tips-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
+    .tip-chip {
+      background: rgba(255,154,108,0.1);
+      border: 1px solid rgba(255,154,108,0.2);
+      border-radius: 20px; padding: 4px 12px;
+      color: rgba(255,255,255,0.65); font-size: 10px;
+    }
+    .shutter-row { display: flex; align-items: center; justify-content: center; gap: 30px; }
+    .side-btn {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: none; color: #fff; font-size: 18px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .shutter-btn {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: #fff;
+      border: 4px solid rgba(255,255,255,0.25);
+      outline: 4px solid rgba(255,255,255,0.12);
+      outline-offset: 2px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ===================================
+       SCREEN 5 â€” RESULTS
+    =================================== */
+    #screen-results { background: var(--dark); }
+    .results-hero { padding: 12px 20px 16px; display: flex; align-items: center; gap: 14px; }
+    .face-avatar {
+      width: 70px; height: 70px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,154,108,0.3), rgba(255,110,145,0.2));
+      border: 2px solid rgba(255,154,108,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px; flex-shrink: 0;
+    }
+    .big-score-card {
+      margin: 0 20px 16px;
+      background: linear-gradient(135deg, rgba(255,154,108,0.12), rgba(255,110,145,0.06));
+      border: 1px solid rgba(255,154,108,0.2);
+      border-radius: 20px; padding: 20px; text-align: center;
+    }
+    .big-score-num { font-size: 64px; font-weight: 500; color: var(--g1); line-height: 1; }
+    .big-score-lbl { color: var(--muted); font-size: 11px; margin-top: 5px; }
+    .score-pills { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+    .score-pill {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px; font-size: 10px; color: rgba(255,255,255,0.5);
+    }
+    .metrics-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; padding: 0 20px 16px;
+    }
+    .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; }
+    .metric-name { color: var(--muted); font-size: 10px; margin-bottom: 8px; }
+    .metric-track { height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; margin-bottom: 5px; overflow: hidden; }
+    .metric-fill { height: 100%; border-radius: 3px; }
+    .metric-val { color: #fff; font-size: 12px; font-weight: 500; }
+
+    .issues-list { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .issue-row {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 12px 14px;
+    }
+    .issue-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .issue-name { color: #fff; font-size: 13px; font-weight: 500; }
+    .issue-zone { color: var(--muted); font-size: 10px; margin-top: 2px; }
+    .issue-sev { margin-left: auto; font-size: 9px; padding: 4px 10px; border-radius: 12px; white-space: nowrap; }
+
+    .routine-card { margin: 0 20px 10px; background: var(--card); border: 1px solid var(--border2); border-radius: 18px; padding: 16px; }
+    .routine-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .routine-items { display: flex; flex-direction: column; gap: 8px; }
+    .routine-item { display: flex; align-items: flex-start; gap: 10px; }
+    .routine-num { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,154,108,0.15); color: var(--g1); font-size: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 600; }
+    .routine-text { color: rgba(255,255,255,0.6); font-size: 11px; line-height: 1.5; padding-top: 4px; }
+
+    /* ===================================
+       SCREEN 6 â€” PLANES
+    =================================== */
+    #screen-plans { background: var(--dark); overflow-y: auto; }
+    .toggle-bar {
+      display: flex;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 50px; padding: 4px;
+      margin: 0 auto 20px; width: fit-content;
+    }
+    .toggle-btn { padding: 8px 22px; border-radius: 50px; font-size: 12px; border: none; cursor: pointer; transition: all 0.2s; }
+    .toggle-btn.on { background: linear-gradient(135deg, var(--g1), var(--pink)); color: #fff; }
+    .toggle-btn:not(.on) { background: none; color: var(--muted); }
+    .save-chip { background: rgba(50,220,130,0.12); color: var(--success); font-size: 9px; padding: 2px 8px; border-radius: 10px; margin-left: 4px; }
+
+    .vs-comp {
+      margin: 0 20px 18px;
+      background: rgba(255,50,50,0.05);
+      border: 1px solid rgba(255,100,100,0.15);
+      border-radius: 16px; padding: 14px 16px;
+    }
+    .vs-title { color: rgba(255,255,255,0.5); font-size: 11px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .vs-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .vs-name { color: rgba(255,255,255,0.4); font-size: 10px; }
+    .vs-price { font-size: 12px; font-weight: 500; }
+    .vs-note { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 10px; color: rgba(255,154,108,0.85); }
+
+    .plan-cards { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+    .plan-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px; position: relative; }
+    .plan-card.popular { border-color: rgba(255,154,108,0.5); }
+    .popular-label {
+      position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--g1), var(--pink));
+      color: #fff; font-size: 10px; padding: 5px 16px;
+      border-radius: 0 0 12px 12px; font-weight: 500;
+    }
+    .plan-name { color: #fff; font-size: 16px; font-weight: 500; margin-bottom: 3px; }
+    .plan-tagline { color: var(--muted); font-size: 11px; margin-bottom: 10px; }
+    .plan-price-row { display: flex; align-items: baseline; gap: 5px; margin-bottom: 14px; }
+    .plan-amount { color: var(--g1); font-size: 32px; font-weight: 500; }
+    .plan-period { color: var(--muted); font-size: 12px; }
+    .plan-features { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .plan-feature { display: flex; align-items: center; gap: 10px; font-size: 11px; color: rgba(255,255,255,0.75); }
+    .plan-feature i { font-size: 14px; color: var(--g1); }
+    .plan-feature.dim { color: var(--muted2); }
+    .plan-feature.dim i { color: var(--muted2); }
+    .plan-btn-primary { width: 100%; background: linear-gradient(135deg, var(--g1), var(--pink)); color: #fff !important; border: none; border-radius: 12px; padding: 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .plan-btn-secondary { width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 14px; font-size: 13px; cursor: pointer; }
+
+    .trust-badges { display: flex; justify-content: center; gap: 20px; padding: 0 20px 24px; }
+    .trust-item { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; }
+    .trust-item i { font-size: 14px; color: var(--g1); }
+
+    /* ===================================
+       SCREEN 7 â€” SERVICIOS
+    =================================== */
+    #screen-services { background: var(--dark); }
+    .service-list { display: flex; flex-direction: column; gap: 12px; padding: 0 20px; }
+    .service-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 18px;
+      display: flex; align-items: flex-start; gap: 16px;
+      cursor: pointer; position: relative; overflow: hidden;
+    }
+    .service-icon { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+    .service-name { color: #fff; font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .service-desc { color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .service-tags { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
+    .service-tag { font-size: 9px; padding: 3px 9px; border-radius: 12px; }
+    .pro-badge {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(255,210,125,0.15);
+      border: 1px solid rgba(255,210,125,0.3);
+      border-radius: 12px; padding: 3px 9px;
+      font-size: 9px; color: var(--gold);
+      display: flex; align-items: center; gap: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ================================
+       SCREEN 0 â€” LOGIN
+  ================================= -->
+  <div id="screen-login" class="screen active">
+    <div class="status-bar" style="padding-top:18px;">
+      <span>9:41</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <i class="ti ti-wifi" style="font-size:14px;color:#fff;"></i>
+        <div class="bat"><div class="bat-fill"></div></div>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;">
+      <div class="logo-rings" style="margin-bottom:12px;">
+        <div class="logo-circle">
+          <span class="logo-g">G</span>
+          <span class="logo-sparkle">âœ¨</span>
+        </div>
+      </div>
+      <div class="login-box">
+        <div class="login-title">Bienvenida a Glowia</div>
+        <div class="login-subtitle">Ingresa tu email para continuar</div>
+        <div id="login-error" class="login-error">Este email no tiene acceso a Glowia.<br>Contacta a la administradora para solicitar acceso.</div>
+        <input class="form-input" id="login-email" type="email" placeholder="tu@email.com"/>
+        <input class="form-input" id="login-pass" type="password" placeholder="Contrasena"/>
+        <button class="login-cta" onclick="tryLogin()">Ingresar a Glowia</button>
+        <div class="login-hint">
+          No tienes acceso? <span onclick="showScreen('screen-pending')">Solicitar acceso</span>
+        </div>
+      </div>
+      <div class="login-badges">
+        <div class="login-badge"><i class="ti ti-shield-check"></i>Privado</div>
+        <div class="login-badge"><i class="ti ti-brain"></i>IA Avanzada</div>
+        <div class="login-badge"><i class="ti ti-star"></i>4.9 â˜…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================
+       SCREEN 1 â€” ACCESO PENDIENTE
+  ================================= -->
+  <div id="screen-pending" class="screen">
+    <div class="status-bar" style="padding-top:18px;">
+      <span>9:41</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div class="bat"><div class="bat-fill"></div></div>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;">
+      <div class="pending-icon">ðŸ”</div>
+      <div class="pending-title">Acceso restringido</div>
+      <div class="pending-sub">Glowia es una plataforma de acceso exclusivo. Tu email aun no esta registrado en nuestra base de usuarios aprobados.</div>
+      <div class="pending-email-box">tu@email.com</div>
+      <div class="pending-steps">
+        <div class="pending-step">
+          <div class="step-num">1</div>
+          <div class="step-text">Contacta a la administradora de Glowia y proporciona tu email para solicitar acceso.</div>
+        </div>
+        <div class="pending-step">
+          <div class="step-num">2</div>
+          <div class="step-text">Una vez que tu email sea aprobado recibiras una confirmacion para ingresar.</div>
+        </div>
+        <div class="pending-step">
+          <div class="step-num">3</div>
+          <div class="step-text">Regresa aqui e inicia sesion con tu email y contrasena.</div>
+        </div>
+      </div>
+      <button class="back-link" onclick="showScreen('screen-login')">Volver al inicio de sesion</button>
+    </div>
+  </div>
+
+  <!-- ================================
+       SCREEN 2 â€” ADMIN PANEL
+  ================================= -->
+  <div id="screen-admin" class="screen">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-home')"><i class="ti ti-arrow-left"></i></button>
+        <span style="font-size:15px;font-weight:500;">Panel de administracion</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div class="scroll-view">
+      <div class="admin-header">
+        <div class="admin-badge-wrap">
+          <i class="ti ti-shield-check" style="font-size:12px;"></i>
+          Administradora
+        </div>
+        <div class="admin-title">Control de accesos</div>
+        <div class="admin-email-lbl">ellaevoluciona.s@gmail.com</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="stat-total">4</div>
+          <div class="stat-label">Total usuarios</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-active" style="color:var(--success);">4</div>
+          <div class="stat-label">Activos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-revoked" style="color:var(--danger);">0</div>
+          <div class="stat-label">Revocados</div>
+        </div>
+      </div>
+
+      <div class="add-user-section">
+        <div class="add-user-title">
+          <i class="ti ti-user-plus" style="font-size:16px;color:var(--g1);"></i>
+          Dar acceso a un email
+        </div>
+        <div class="add-row" style="margin-bottom:8px;">
+          <input class="admin-input" id="new-name" type="text" placeholder="Nombre (ej: Maria)"/>
+        </div>
+        <div class="add-row">
+          <input class="admin-input" id="new-email" type="email" placeholder="email@ejemplo.com"/>
+          <button class="add-btn" onclick="addUser()">+ Agregar</button>
+        </div>
+        <div id="msg-success" class="msg-success"><i class="ti ti-check"></i> Acceso otorgado correctamente</div>
+        <div id="msg-error" class="msg-error"><i class="ti ti-x"></i> <span id="msg-error-text">Email invalido</span></div>
+      </div>
+
+      <div class="search-section">
+        <div class="search-wrap">
+          <i class="ti ti-search search-icon"></i>
+          <input class="search-input" id="search-input" placeholder="Buscar por email..." oninput="renderUsers()"/>
+        </div>
+      </div>
+
+      <div class="users-section">
+        <div class="users-header">
+          <span class="users-title">Usuarios registrados</span>
+          <span class="users-count" id="users-count">4 emails</span>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" id="tab-all" onclick="setFilter('all')">Todos</button>
+          <button class="filter-tab" id="tab-active" onclick="setFilter('active')">Activos</button>
+          <button class="filter-tab" id="tab-revoked" onclick="setFilter('revoked')">Revocados</button>
+        </div>
+        <div class="user-list" id="user-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================
+       SCREEN 3 â€” HOME
+  ================================= -->
+  <div id="screen-home" class="screen">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <i class="ti ti-wifi" style="font-size:14px;color:#fff;"></i>
+        <div class="bat"><div class="bat-fill"></div></div>
+      </div>
+    </div>
+    <!-- Banner admin â€” SOLO visible para ellaevoluciona.s@gmail.com -->
+    <div id="admin-banner" style="display:none;padding:6px 20px 2px;">
+      <button onclick="showScreen('screen-admin')" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:rgba(255,210,125,0.08);border:1px solid rgba(255,210,125,0.3);border-radius:14px;padding:10px 16px;cursor:pointer;">
+        <span style="display:flex;align-items:center;gap:8px;color:#ffd27d;font-size:12px;font-weight:500;"><i class="ti ti-shield-check" style="font-size:14px;"></i>Panel de administracion</span>
+        <i class="ti ti-chevron-right" style="color:rgba(255,210,125,0.6);font-size:14px;"></i>
+      </button>
+    </div>
+    <div class="home-header">
+      <div>
+        <div class="home-name" id="home-greeting">Hola ✨</div>
+        <div class="home-sub">Tu piel esta mejorando</div>
+      </div>
+      <div style="position:relative;">
+        <button class="notif-btn"><i class="ti ti-bell"></i></button>
+        <div class="notif-dot"></div>
+      </div>
+    </div>
+    <div class="scroll-view">
+      <div class="score-card" onclick="showScreen('screen-results')">
+        <div class="score-top">
+          <div>
+            <div class="score-label">Puntuacion Glowia</div>
+            <div class="score-number">78<span>/ 100</span></div>
+          </div>
+          <div class="trend-badge">
+            <i class="ti ti-trending-up" style="font-size:12px;"></i>+5 esta semana
+          </div>
+        </div>
+        <div class="score-bars">
+          <div class="sbar"><div class="sbar-name">Hidrat.</div><div class="sbar-track"><div class="sbar-fill" style="width:82%;background:var(--g1);"></div></div><div class="sbar-val">82%</div></div>
+          <div class="sbar"><div class="sbar-name">Elast.</div><div class="sbar-track"><div class="sbar-fill" style="width:71%;background:var(--pink);"></div></div><div class="sbar-val">71%</div></div>
+          <div class="sbar"><div class="sbar-name">Unifor.</div><div class="sbar-track"><div class="sbar-fill" style="width:65%;background:#c47dff;"></div></div><div class="sbar-val">65%</div></div>
+          <div class="sbar"><div class="sbar-name">Brillo</div><div class="sbar-track"><div class="sbar-fill" style="width:58%;background:#64b4ff;"></div></div><div class="sbar-val">58%</div></div>
+        </div>
+      </div>
+
+      <div class="streak-card">
+        <div>
+          <div class="streak-num">12</div>
+          <div class="streak-label">dias de racha</div>
+          <div class="streak-sub">Sigue asi, lo estas haciendo genial</div>
+        </div>
+        <div class="streak-days">
+          <div class="streak-day done">L</div>
+          <div class="streak-day done">M</div>
+          <div class="streak-day done">X</div>
+          <div class="streak-day done">J</div>
+          <div class="streak-day done">V</div>
+          <div class="streak-day" style="background:rgba(255,154,108,0.15);color:var(--g1);">S</div>
+          <div class="streak-day">D</div>
+        </div>
+      </div>
+
+      <div class="section-header" style="margin-top:8px;">
+        <span class="section-title">Servicios Glowia</span>
+        <button class="section-link" onclick="showScreen('screen-services')">Ver todos</button>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card" onclick="showScreen('screen-scan')">
+          <div class="feature-icon" style="background:rgba(255,154,108,0.12);">ðŸ”¬</div>
+          <div class="feature-name">Escaneo IA</div>
+          <div class="feature-desc">18 indicadores de tu piel</div>
+          <div class="feature-tag" style="background:rgba(50,220,130,0.1);color:var(--success);">Disponible</div>
+        </div>
+        <div class="feature-card" onclick="showScreen('screen-services')">
+          <div class="feature-icon" style="background:rgba(255,110,145,0.12);">ðŸ’Š</div>
+          <div class="feature-name">Scanner Ingredientes</div>
+          <div class="feature-desc">Analiza cualquier producto</div>
+          <div class="feature-tag" style="background:rgba(255,210,125,0.1);color:var(--gold);">Pro</div>
+        </div>
+        <div class="feature-card" onclick="showScreen('screen-services')">
+          <div class="feature-icon" style="background:rgba(100,180,255,0.12);">ðŸ“ˆ</div>
+          <div class="feature-name">Tracker de progreso</div>
+          <div class="feature-desc">Evolucion semana a semana</div>
+          <div class="feature-tag" style="background:rgba(255,210,125,0.1);color:var(--gold);">Pro</div>
+        </div>
+        <div class="feature-card" onclick="showScreen('screen-services')">
+          <div class="feature-icon" style="background:rgba(196,125,255,0.12);">ðŸ‘©â€âš•ï¸</div>
+          <div class="feature-name">Dermatologa IA</div>
+          <div class="feature-desc">Consulta 24/7 con IA</div>
+          <div class="feature-tag" style="background:rgba(196,125,255,0.1);color:#c47dff;">Ultra</div>
+        </div>
+      </div>
+
+      <div class="promo-banner" onclick="showScreen('screen-plans')" style="margin:0 20px 24px;">
+        <div class="promo-gold">Desbloquea Glowia Pro</div>
+        <div class="promo-title">Accede a todos los servicios de IA avanzada</div>
+        <div class="promo-tags">
+          <span class="promo-tag">Rutina IA personalizada</span>
+          <span class="promo-tag">Scanner ingredientes</span>
+          <span class="promo-tag">Consultas ilimitadas</span>
+        </div>
+        <button class="promo-cta">Ver planes <i class="ti ti-arrow-right" style="font-size:13px;"></i></button>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <button class="nav-item active"><i class="ti ti-home"></i><span>Inicio</span></button>
+      <button class="nav-item" onclick="showScreen('screen-scan')"><i class="ti ti-scan"></i><span>Escanear</span></button>
+      <button class="nav-item" onclick="showScreen('screen-services')"><i class="ti ti-sparkles"></i><span>Servicios</span></button>
+      <button class="nav-item" onclick="showScreen('screen-plans')"><i class="ti ti-crown"></i><span>Pro</span></button>
+      <button class="nav-item"><i class="ti ti-user"></i><span>Perfil</span></button>
+    </div>
+  </div>
+
+  <!-- ================================
+       SCREEN 4 â€” SCAN (CAMARA REAL)
+  ================================= -->
+  <div id="screen-scan" class="screen" style="background:#000;position:relative;">
+    <!-- Barra superior -->
+    <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent);padding:14px 20px 30px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="stopCamera();showScreen('screen-home');" style="color:#fff;font-size:22px;">â†</button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Escaneo Glowia IA</span>
+      </div>
+      <span style="color:var(--g1);font-size:12px;background:rgba(255,154,108,0.15);border:1px solid rgba(255,154,108,0.3);border-radius:20px;padding:4px 12px;">18 puntos</span>
+    </div>
+
+    <!-- Video en vivo -->
+    <video id="cam-video" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;"></video>
+
+    <!-- Canvas oculto para capturar foto -->
+    <canvas id="cam-canvas" style="display:none;"></canvas>
+
+    <!-- Overlay con oval y efectos -->
+    <div style="position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+      <!-- Fondo oscuro fuera del oval usando clip-path -->
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45);"></div>
+      <!-- Oval recortado -->
+      <div id="face-oval-live" style="width:210px;height:265px;border-radius:50%;border:2px solid rgba(255,154,108,0.8);position:relative;box-shadow:0 0 0 9999px rgba(0,0,0,0.45),0 0 30px rgba(255,154,108,0.3);overflow:hidden;">
+        <div id="scan-line-live" style="display:none;position:absolute;left:-5%;right:-5%;height:2px;background:linear-gradient(90deg,transparent,rgba(255,154,108,0.9),transparent);animation:scanAnim 1.8s ease-in-out infinite;"></div>
+      </div>
+      <!-- Esquinas decorativas -->
+      <div style="position:absolute;top:calc(50% - 132px);left:calc(50% - 105px);width:22px;height:22px;border-top:2px solid var(--g1);border-left:2px solid var(--g1);border-radius:3px 0 0 0;"></div>
+      <div style="position:absolute;top:calc(50% - 132px);right:calc(50% - 105px);width:22px;height:22px;border-top:2px solid var(--g1);border-right:2px solid var(--g1);border-radius:0 3px 0 0;"></div>
+      <div style="position:absolute;bottom:calc(50% - 132px);left:calc(50% - 105px);width:22px;height:22px;border-bottom:2px solid var(--g1);border-left:2px solid var(--g1);border-radius:0 0 0 3px;"></div>
+      <div style="position:absolute;bottom:calc(50% - 132px);right:calc(50% - 105px);width:22px;height:22px;border-bottom:2px solid var(--g1);border-right:2px solid var(--g1);border-radius:0 0 3px 0;"></div>
+    </div>
+
+    <!-- Badge IA -->
+    <div id="ai-badge-live" style="position:absolute;top:80px;left:50%;transform:translateX(-50%);z-index:5;background:rgba(255,154,108,0.15);border:1px solid rgba(255,154,108,0.35);border-radius:20px;padding:5px 16px;white-space:nowrap;">
+      <span style="color:var(--g1);font-size:11px;" id="scan-msg">Centra tu rostro en el oval</span>
+    </div>
+
+    <!-- Mensaje de error camara -->
+    <div id="cam-error" style="display:none;position:absolute;inset:0;z-index:20;background:#0f0a0e;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:16px;">ðŸ“·</div>
+      <div style="color:#fff;font-size:16px;font-weight:500;margin-bottom:10px;">Camara no disponible</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.7;margin-bottom:24px;">Permite el acceso a la camara en tu navegador para usar el escaneo facial.</div>
+      <button onclick="initCamera()" style="background:linear-gradient(135deg,var(--g1),var(--pink));color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:13px;cursor:pointer;">Intentar de nuevo</button>
+      <button onclick="showScreen('screen-home')" style="margin-top:12px;background:none;border:none;color:rgba(255,255,255,0.45);font-size:12px;cursor:pointer;text-decoration:underline;">Volver al inicio</button>
+    </div>
+
+    <!-- Foto capturada preview -->
+    <div id="photo-preview" style="display:none;position:absolute;inset:0;z-index:15;background:#000;flex-direction:column;align-items:center;justify-content:center;">
+      <img id="photo-img" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" src="" alt="foto"/>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);padding:24px 24px 36px;z-index:16;">
+        <div style="color:#fff;font-size:14px;font-weight:500;text-align:center;margin-bottom:6px;" id="analyzing-msg">Analizando tu piel...</div>
+        <div id="progress-bar-wrap" style="height:4px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;margin-bottom:16px;">
+          <div id="progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--g1),var(--pink));border-radius:2px;transition:width 0.3s;"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="retakePhoto()" style="flex:1;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:13px;font-size:13px;cursor:pointer;">Repetir</button>
+          <button id="btn-analyze" onclick="analyzePhoto()" style="flex:2;background:linear-gradient(135deg,var(--g1),var(--pink));color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:500;cursor:pointer;">Analizar âœ¨</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controles inferiores -->
+    <div style="position:absolute;bottom:0;left:0;right:0;z-index:5;background:linear-gradient(to top,rgba(0,0,0,0.85),transparent);padding:16px 24px 36px;">
+      <div class="scan-status" id="scan-tip" style="text-align:center;color:rgba(255,255,255,0.6);font-size:12px;margin-bottom:12px;">Sin maquillaje Â· Luz natural Â· Expresion neutra</div>
+      <div class="shutter-row">
+        <button class="side-btn" onclick="switchCamera()" title="Cambiar camara"><i class="ti ti-switch-camera"></i></button>
+        <button class="shutter-btn" id="shutter-btn" onclick="capturePhoto()" style="background:#fff;border:4px solid rgba(255,255,255,0.3);outline:4px solid rgba(255,255,255,0.15);outline-offset:2px;">
+          <i class="ti ti-camera" style="color:#0f0a0e;font-size:28px;"></i>
+        </button>
+        <button class="side-btn" id="flash-btn" onclick="toggleFlash()" title="Flash"><i class="ti ti-bolt"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================
+       SCREEN 5 â€” RESULTS
+  ================================= -->
+  <div id="screen-results" class="screen">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-home')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Resultados del analisis</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div class="scroll-view">
+      <div class="results-hero">
+        <div class="face-avatar">ðŸ§–</div>
+        <div>
+          <div style="color:#fff;font-size:16px;font-weight:500;">Analisis Glowia IA</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:3px;">18 zonas Â· 8 indicadores Â· hoy 9:42 am</div>
+          <span style="background:rgba(50,220,130,0.1);border:1px solid rgba(50,220,130,0.2);border-radius:12px;padding:3px 10px;font-size:10px;color:var(--success);display:inline-block;margin-top:7px;">98.4% de precision</span>
+        </div>
+      </div>
+
+      <div class="big-score-card">
+        <div class="big-score-num">78</div>
+        <div class="big-score-lbl">Puntuacion global de piel</div>
+        <div class="score-pills">
+          <div class="score-pill">Tipo: Mixta</div>
+          <div class="score-pill">Sensibilidad: Media</div>
+          <div class="score-pill">Edad aparente: 26</div>
+        </div>
+      </div>
+
+      <div class="sec-label">Metricas detalladas</div>
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="metric-name">Hidratacion</div><div class="metric-track"><div class="metric-fill" style="width:82%;background:var(--g1);"></div></div><div class="metric-val">82%</div></div>
+        <div class="metric-card"><div class="metric-name">Elasticidad</div><div class="metric-track"><div class="metric-fill" style="width:71%;background:var(--pink);"></div></div><div class="metric-val">71%</div></div>
+        <div class="metric-card"><div class="metric-name">Uniformidad tono</div><div class="metric-track"><div class="metric-fill" style="width:65%;background:#c47dff;"></div></div><div class="metric-val">65%</div></div>
+        <div class="metric-card"><div class="metric-name">Control de sebo</div><div class="metric-track"><div class="metric-fill" style="width:58%;background:#64b4ff;"></div></div><div class="metric-val">58%</div></div>
+      </div>
+
+      <div class="sec-label">Preocupaciones detectadas</div>
+      <div class="issues-list">
+        <div class="issue-row">
+          <div class="issue-icon" style="background:rgba(240,100,100,0.1);">ðŸ”´</div>
+          <div><div class="issue-name">Rojez leve</div><div class="issue-zone">Zona nasal y mejillas</div></div>
+          <span class="issue-sev" style="background:rgba(240,100,100,0.1);color:#f06464;">Media</span>
+        </div>
+        <div class="issue-row">
+          <div class="issue-icon" style="background:rgba(212,165,116,0.1);">â­•</div>
+          <div><div class="issue-name">Poros dilatados</div><div class="issue-zone">Zona T</div></div>
+          <span class="issue-sev" style="background:rgba(212,165,116,0.1);color:#d4a574;">Leve</span>
+        </div>
+        <div class="issue-row">
+          <div class="issue-icon" style="background:rgba(100,180,255,0.1);">ðŸ’§</div>
+          <div><div class="issue-name">Deshidratacion</div><div class="issue-zone">Contorno de ojos</div></div>
+          <span class="issue-sev" style="background:rgba(100,180,255,0.1);color:#64b4ff;">Leve</span>
+        </div>
+      </div>
+
+      <div class="routine-card">
+        <div class="routine-head">
+          <span style="font-size:20px;">âœ¨</span>
+          <span style="color:#fff;font-size:13px;font-weight:500;">Rutina recomendada por IA</span>
+        </div>
+        <div class="routine-items">
+          <div class="routine-item"><div class="routine-num">1</div><div class="routine-text">Limpiador suave con acido hialuronico â€” AM/PM</div></div>
+          <div class="routine-item"><div class="routine-num">2</div><div class="routine-text">Serum con niacinamida 10% para reducir rojez â€” AM</div></div>
+          <div class="routine-item"><div class="routine-num">3</div><div class="routine-text">Hidratante con ceramidas para barrera cutanea â€” AM/PM</div></div>
+          <div class="routine-item"><div class="routine-num">4</div><div class="routine-text">Protector solar SPF 50+ â€” AM obligatorio</div></div>
+        </div>
+      </div>
+
+      <div style="padding:10px 20px 6px;">
+        <button class="btn-primary">âœ¨ Ver rutina completa personalizada</button>
+      </div>
+      <div style="padding:0 20px 20px;">
+        <button class="btn-secondary" onclick="showScreen('screen-plans')">
+          <i class="ti ti-crown"></i>Desbloquear analisis detallado Pro
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================
+       SCREEN 6 â€” PLANES
+  ================================= -->
+  <div id="screen-plans" class="screen">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-home')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Planes Glowia</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div class="scroll-view">
+      <div style="text-align:center;padding:8px 24px 16px;color:var(--muted);font-size:12px;line-height:1.6;">Invierte en tu piel. Cancela cuando quieras.</div>
+
+      <div style="display:flex;justify-content:center;margin-bottom:18px;">
+        <div class="toggle-bar">
+          <button class="toggle-btn" id="tab-monthly" onclick="setPricing('monthly')">Mensual</button>
+          <button class="toggle-btn on" id="tab-annual" onclick="setPricing('annual')">Anual<span class="save-chip">-40%</span></button>
+        </div>
+      </div>
+
+
+      <div class="plan-cards">
+        <!-- PRO -->
+        <div class="plan-card popular">
+          <div class="popular-label">Mas popular</div>
+          <div class="plan-name" style="margin-top:12px;">Pro</div>
+          <div class="plan-tagline">La experiencia completa</div>
+          <div class="plan-price-row">
+            <span class="plan-amount" id="price-pro">$12.99</span>
+            <span class="plan-period" id="period-pro">/mes Â· facturado anual</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feature"><i class="ti ti-check"></i>Escaneos IA ilimitados</div>
+            <div class="plan-feature"><i class="ti ti-check"></i>18 indicadores de piel</div>
+            <div class="plan-feature"><i class="ti ti-check"></i>Scanner de ingredientes</div>
+            <div class="plan-feature"><i class="ti ti-check"></i>Rutina IA personalizada</div>
+            <div class="plan-feature"><i class="ti ti-check"></i>Tracker de progreso</div>
+            <div class="plan-feature dim"><i class="ti ti-x"></i>Dermatologa IA 24/7</div>
+          </div>
+          <button class="plan-btn-primary" style="margin-top:16px;" onclick="window.open('https://pay.hotmart.com/H106555637K?checkoutMode=10','_blank')">Empezar Pro</button>
+        </div>
+        <!-- ULTRA -->
+        <div class="plan-card">
+          <div class="plan-name">Ultra</div>
+          <div class="plan-tagline">Para pieles que exigen lo mejor</div>
+          <div class="plan-price-row">
+            <span class="plan-amount" id="price-ultra">$24.99</span>
+            <span class="plan-period" id="period-ultra">/mes Â· facturado anual</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feature"><i class="ti ti-check"></i>Todo lo de Pro incluido</div>
+            <div class="plan-feature"><i class="ti ti-check"></i>Dermatologa IA 24/7</div>
+            <div class="plan-feature"><i class="ti ti-check"></i>Analisis hormonal y ciclo</div>
+            <div class="plan-feature"><i class="ti ti-check"></i>Dieta y piel personalizada</div>
+            <div class="plan-feature"><i class="ti ti-check"></i>Reporte PDF mensual</div>
+          </div>
+          <button class="plan-btn-secondary" style="margin-top:16px;">Ver Ultra</button>
+        </div>
+      </div>
+
+      <div class="trust-badges">
+        <div class="trust-item"><i class="ti ti-shield-check"></i>Sin contrato</div>
+        <div class="trust-item"><i class="ti ti-refresh"></i>Cancela facil</div>
+        <div class="trust-item"><i class="ti ti-lock"></i>Pago seguro</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================
+       SCREEN 7 â€” SERVICIOS
+  ================================= -->
+  <div id="screen-services" class="screen">
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="back-btn" onclick="showScreen('screen-home')"><i class="ti ti-arrow-left"></i></button>
+        <span style="color:#fff;font-size:15px;font-weight:500;">Todos los servicios</span>
+      </div>
+      <div class="bat"><div class="bat-fill"></div></div>
+    </div>
+    <div class="scroll-view">
+      <div style="padding:6px 20px 16px;color:var(--muted);font-size:12px;">Powered by Glowia AI Â· Actualizado constantemente</div>
+      <div class="service-list">
+        <div class="service-card" onclick="showScreen('screen-scan')">
+          <div class="service-icon" style="background:rgba(255,154,108,0.12);">ðŸ”¬</div>
+          <div>
+            <div class="service-name">Escaneo facial IA</div>
+            <div class="service-desc">Analiza 18 indicadores con tu camara. Deteccion de rojez, poros, arrugas, manchas, hidratacion y mas.</div>
+            <div class="service-tags"><span class="service-tag" style="background:rgba(50,220,130,0.1);color:var(--success);">Incluido gratis</span></div>
+          </div>
+        </div>
+        <div class="service-card">
+          <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Pro</div>
+          <div class="service-icon" style="background:rgba(255,110,145,0.12);">ðŸ’Š</div>
+          <div>
+            <div class="service-name">Scanner de ingredientes</div>
+            <div class="service-desc">Escanea la etiqueta de cualquier producto. Detecta ingredientes daninos, comedogenicos o incompatibles con tu tipo de piel.</div>
+            <div class="service-tags"><span class="service-tag" style="background:rgba(255,210,125,0.1);color:var(--gold);">Plan Pro</span></div>
+          </div>
+        </div>
+        <div class="service-card">
+          <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Pro</div>
+          <div class="service-icon" style="background:rgba(100,180,255,0.12);">ðŸ“ˆ</div>
+          <div>
+            <div class="service-name">Tracker de progreso</div>
+            <div class="service-desc">Compara tu piel semana a semana con graficas detalladas. Ve exactamente como evoluciona cada indicador.</div>
+            <div class="service-tags"><span class="service-tag" style="background:rgba(255,210,125,0.1);color:var(--gold);">Plan Pro</span></div>
+          </div>
+        </div>
+        <div class="service-card">
+          <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Ultra</div>
+          <div class="service-icon" style="background:rgba(50,220,130,0.1);">ðŸ‘©â€âš•ï¸</div>
+          <div>
+            <div class="service-name">Dermatologa IA 24/7</div>
+            <div class="service-desc">Consulta ilimitada con IA especializada en dermatologia. Identifica patologias, resuelve dudas y recibe orientacion profesional.</div>
+            <div class="service-tags"><span class="service-tag" style="background:rgba(196,125,255,0.1);color:#c47dff;">Plan Ultra</span></div>
+          </div>
+        </div>
+        <div class="service-card">
+          <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Ultra</div>
+          <div class="service-icon" style="background:rgba(196,125,255,0.12);">ðŸŒ™</div>
+          <div>
+            <div class="service-name">Analisis hormonal y ciclo</div>
+            <div class="service-desc">Correlaciona tu ciclo menstrual con el estado de tu piel. Anticipa brotes hormonales y ajusta tu rutina automaticamente.</div>
+            <div class="service-tags"><span class="service-tag" style="background:rgba(196,125,255,0.1);color:#c47dff;">Plan Ultra</span></div>
+          </div>
+        </div>
+        <div class="service-card">
+          <div class="pro-badge"><i class="ti ti-crown" style="font-size:10px;"></i>Ultra</div>
+          <div class="service-icon" style="background:rgba(255,210,125,0.12);">ðŸ¥—</div>
+          <div>
+            <div class="service-name">Dieta y piel</div>
+            <div class="service-desc">La IA detecta que alimentos afectan tu piel y crea planes nutricionales personalizados para ti.</div>
+            <div class="service-tags"><span class="service-tag" style="background:rgba(255,210,125,0.1);color:var(--gold);">Plan Ultra</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:16px 20px 24px;">
+        <button class="btn-primary" onclick="showScreen('screen-plans')">
+          <i class="ti ti-crown"></i>Ver planes y precios
+        </button>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <button class="nav-item" onclick="showScreen('screen-home')"><i class="ti ti-home"></i><span>Inicio</span></button>
+      <button class="nav-item" onclick="showScreen('screen-scan')"><i class="ti ti-scan"></i><span>Escanear</span></button>
+      <button class="nav-item active"><i class="ti ti-sparkles"></i><span>Servicios</span></button>
+      <button class="nav-item" onclick="showScreen('screen-plans')"><i class="ti ti-crown"></i><span>Pro</span></button>
+      <button class="nav-item"><i class="ti ti-user"></i><span>Perfil</span></button>
+    </div>
+  </div>
+
+</div><!-- end .phone -->
+
+<script>
+  /* =========================================
+     CONFIGURACION â€” SOLO EDITAR ESTO
+  ========================================= */
+  const ADMIN_EMAIL = 'ellaevoluciona.s@gmail.com';
+  let isAdmin = false;
+
+  let users = [];
+
+  /* navegacion â€” ver funcion showScreen en seccion CAMARA REAL */
+
+  /* =========================================
+     LOGIN
+  ========================================= */
+  function tryLogin() {
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const err   = document.getElementById('login-error');
+    err.classList.remove('show');
+
+    if (!email) { err.classList.add('show'); return; }
+
+    if (email === ADMIN_EMAIL.toLowerCase()) {
+      isAdmin = true;
+      document.getElementById('admin-banner').style.display = 'block';
+      document.getElementById('home-greeting').textContent = 'Hola, Administradora ✨';
+      showScreen('screen-home'); return;
+    }
+
+    isAdmin = false;
+    document.getElementById('admin-banner').style.display = 'none';
+    const found = users.find(u => u.email.toLowerCase() === email && u.status === 'active');
+    if (found) {
+      const nombre = found.nombre || email.split('@')[0];
+      document.getElementById('home-greeting').textContent = 'Hola, ' + nombre + ' ✨';
+      showScreen('screen-home');
+    } else {
+      err.classList.add('show');
+    }
+  }
+
+  /* =========================================
+     ADMIN â€” AGREGAR USUARIO
+  ========================================= */
+  function addUser() {
+    const input   = document.getElementById('new-email');
+    const email   = input.value.trim().toLowerCase();
+    const success = document.getElementById('msg-success');
+    const error   = document.getElementById('msg-error');
+    const errText = document.getElementById('msg-error-text');
+
+    success.style.display = 'none';
+    error.style.display   = 'none';
+
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      errText.textContent = 'Ingresa un email valido';
+      error.style.display = 'block'; return;
+    }
+    if (email === ADMIN_EMAIL.toLowerCase()) {
+      errText.textContent = 'Este es el email administrador';
+      error.style.display = 'block'; return;
+    }
+    if (users.find(u => u.email.toLowerCase() === email)) {
+      errText.textContent = 'Este email ya tiene acceso registrado';
+      error.style.display = 'block'; return;
+    }
+
+    const initials = email.split('@')[0].slice(0, 2).toUpperCase();
+    const palette  = ['#ff9a6c','#ff6e91','#c47dff','#64b4ff','#32dc82','#ffd27d'];
+    const color    = palette[users.length % palette.length];
+    const now      = new Date();
+    const months   = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const dateStr  = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    const nameInput = document.getElementById('new-name');
+    const nombre = nameInput.value.trim() || email.split('@')[0];
+    users.push({ email, nombre, status: 'active', date: dateStr, av: initials, color });
+    input.value = '';
+    nameInput.value = '';
+    success.style.display = 'block';
+    setTimeout(() => { success.style.display = 'none'; }, 3000);
+    renderUsers();
+    updateStats();
+  }
+
+  /* =========================================
+     ADMIN â€” REVOCAR / RESTAURAR
+  ========================================= */
+  function toggleAccess(email) {
+    const u = users.find(u => u.email === email);
+    if (u) u.status = u.status === 'active' ? 'revoked' : 'active';
+    renderUsers();
+    updateStats();
+  }
+
+  /* =========================================
+     ADMIN â€” FILTRO
+  ========================================= */
+  let currentFilter = 'all';
+
+  function setFilter(f) {
+    currentFilter = f;
+    ['all','active','revoked'].forEach(x => {
+      document.getElementById('tab-' + x).classList.toggle('active', x === f);
+    });
+    renderUsers();
+  }
+
+  /* =========================================
+     ADMIN â€” RENDER LISTA
+  ========================================= */
+  function renderUsers() {
+    const search   = (document.getElementById('search-input') || {value:''}).value.toLowerCase();
+    const filtered = users.filter(u => {
+      const matchFilter = currentFilter === 'all' || u.status === currentFilter;
+      const matchSearch = u.email.toLowerCase().includes(search);
+      return matchFilter && matchSearch;
+    });
+
+    const list  = document.getElementById('user-list');
+    const count = document.getElementById('users-count');
+    if (!list) return;
+
+    count.textContent = filtered.length + ' emails';
+
+    if (filtered.length === 0) {
+      list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.35);font-size:12px;padding:24px 0;">No se encontraron usuarios</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(u => `
+      <div class="user-row">
+        <div class="user-avatar" style="background:${u.color}22;color:${u.color};">${u.av}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="user-email">${u.email}</div>
+          <div class="user-date">${u.date}</div>
+        </div>
+        <div class="user-actions">
+          <span class="status-badge ${u.status === 'active' ? 'status-active' : 'status-revoked'}">
+            ${u.status === 'active' ? 'Activo' : 'Revocado'}
+          </span>
+          <button class="${u.status === 'active' ? 'revoke-btn' : 'restore-btn'}"
+            onclick="toggleAccess('${u.email}')">
+            ${u.status === 'active' ? 'Revocar' : 'Restaurar'}
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateStats() {
+    const active  = users.filter(u => u.status === 'active').length;
+    const revoked = users.filter(u => u.status === 'revoked').length;
+    document.getElementById('stat-total').textContent   = users.length;
+    document.getElementById('stat-active').textContent  = active;
+    document.getElementById('stat-revoked').textContent = revoked;
+  }
+
+  /* =========================================
+     CAMARA REAL
+  ========================================= */
+  let camStream   = null;
+  let facingMode  = 'user';   // 'user' = frontal, 'environment' = trasera
+  let flashActive = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'screen-admin') { renderUsers(); updateStats(); }
+    if (id === 'screen-scan')  { initCamera(); }
+    if (id === 'screen-scan' && camStream) return; // ya activa
+  }
+
+  async function initCamera() {
+    const video    = document.getElementById('cam-video');
+    const errPanel = document.getElementById('cam-error');
+    errPanel.style.display = 'none';
+
+    // Detener stream anterior si existe
+    if (camStream) {
+      camStream.getTracks().forEach(t => t.stop());
+      camStream = null;
+    }
+
+    try {
+      camStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: facingMode,
+          width:  { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
+      video.srcObject = camStream;
+      video.play();
+      document.getElementById('scan-msg').textContent = 'Centra tu rostro en el oval';
+    } catch(e) {
+      errPanel.style.display = 'flex';
+      console.warn('Camara no disponible:', e);
+    }
+  }
+
+  function stopCamera() {
+    if (camStream) {
+      camStream.getTracks().forEach(t => t.stop());
+      camStream = null;
+    }
+    const video = document.getElementById('cam-video');
+    if (video) video.srcObject = null;
+  }
+
+  async function switchCamera() {
+    facingMode = facingMode === 'user' ? 'environment' : 'user';
+    await initCamera();
+  }
+
+  function toggleFlash() {
+    flashActive = !flashActive;
+    const btn = document.getElementById('flash-btn');
+    if (btn) btn.style.color = flashActive ? '#ffd27d' : '';
+    // Flash real solo disponible en movil con track de camara trasera
+    if (camStream) {
+      const track = camStream.getVideoTracks()[0];
+      if (track && track.getCapabilities && track.getCapabilities().torch) {
+        track.applyConstraints({ advanced: [{ torch: flashActive }] });
+      }
+    }
+  }
+
+  function capturePhoto() {
+    const video  = document.getElementById('cam-video');
+    const canvas = document.getElementById('cam-canvas');
+    const img    = document.getElementById('photo-img');
+    if (!video || !camStream) return;
+
+    // Capturar frame del video al canvas
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+
+    // Espejo si es camara frontal
+    if (facingMode === 'user') {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    if (facingMode === 'user') {
+      ctx.setTransform(1,0,0,1,0,0);
+    }
+
+    // Mostrar preview de la foto
+    img.src = canvas.toDataURL('image/jpeg', 0.9);
+    document.getElementById('photo-preview').style.display = 'flex';
+    document.getElementById('scan-line-live').style.display = 'none';
+    document.getElementById('analyzing-msg').textContent = 'Foto capturada âœ“';
+    document.getElementById('progress-bar').style.width = '0%';
+    document.getElementById('btn-analyze').style.display = 'block';
+  }
+
+  function retakePhoto() {
+    document.getElementById('photo-preview').style.display = 'none';
+    document.getElementById('scan-msg').textContent = 'Centra tu rostro en el oval';
+  }
+
+  const scanMessages = [
+    'Detectando puntos de analisis...',
+    'Mapeando 18 zonas faciales...',
+    'Analizando hidratacion y elasticidad...',
+    'Detectando imperfecciones...',
+    'Calculando edad aparente de la piel...',
+    'Generando puntuacion Glowia...',
+    'Analisis completo â€” 98.4% de precision',
+  ];
+
+  function analyzePhoto() {
+    document.getElementById('btn-analyze').style.display = 'none';
+    document.getElementById('scan-line-live').style.display = 'block';
+    const msgEl  = document.getElementById('analyzing-msg');
+    const progEl = document.getElementById('progress-bar');
+    let i = 0;
+    const interval = setInterval(() => {
+      msgEl.textContent  = scanMessages[i];
+      progEl.style.width = Math.round(((i + 1) / scanMessages.length) * 100) + '%';
+      i++;
+      if (i >= scanMessages.length) {
+        clearInterval(interval);
+        setTimeout(() => {
+          document.getElementById('photo-preview').style.display = 'none';
+          document.getElementById('scan-line-live').style.display = 'none';
+          stopCamera();
+          showScreenDirect('screen-results');
+        }, 500);
+      }
+    }, 700);
+  }
+
+  // VersiÃ³n sin reiniciar camara (para navegar desde scan a results)
+  function showScreenDirect(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'screen-admin') { renderUsers(); updateStats(); }
+  }
+
+  function doScan() { capturePhoto(); } // compatibilidad
+
+  /* =========================================
+     PRECIOS â€” TOGGLE MENSUAL/ANUAL
+  ========================================= */
+  const pricing = {
+    monthly: { pro: '$19.99', ultra: '$39.99', period: '/mes' },
+    annual:  { pro: '$12.99', ultra: '$24.99', period: '/mes Â· facturado anual' },
+  };
+
+  function setPricing(mode) {
+    document.getElementById('tab-monthly').classList.toggle('on', mode === 'monthly');
+    document.getElementById('tab-annual').classList.toggle('on', mode === 'annual');
+    document.getElementById('price-pro').textContent   = pricing[mode].pro;
+    document.getElementById('period-pro').textContent  = pricing[mode].period;
+    document.getElementById('price-ultra').textContent  = pricing[mode].ultra;
+    document.getElementById('period-ultra').textContent = pricing[mode].period;
+  }
+
+  /* Init */
+  renderUsers();
+</script>
+</body>
+</html>
