@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Glowia â€“ AI Skin Care Assistant</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+  <title>Glowia – AI Skin Care Assistant</title>
+  <link rel=”manifest” href=”manifest.json”/>
+  <meta name=”theme-color” content=”#ff9a6c”/>
+  <link rel=”apple-touch-icon” href=”icon-192.svg”/>
+  <meta name=”apple-mobile-web-app-capable” content=”yes”/>
+  <meta name=”apple-mobile-web-app-status-bar-style” content=”black-translucent”/>
+  <meta name=”apple-mobile-web-app-title” content=”Glowia”/>
+  <link rel=”stylesheet” href=”https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css”/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1681,6 +1687,10 @@
 
   /* Init */
   renderUsers();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/Glowia-App/sw.js');
+  }
 </script>
 </body>
 </html>

@@ -1,0 +1,24 @@
+{
+  "name": "Glowia – AI Skin Care",
+  "short_name": "Glowia",
+  "description": "Tu asistente de IA para el cuidado de la piel",
+  "start_url": "/Glowia-App/glowia-app.html",
+  "display": "standalone",
+  "background_color": "#0f0a0e",
+  "theme_color": "#ff9a6c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
