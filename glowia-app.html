@@ -1411,7 +1411,7 @@
   /* PRECIOS */
   const pricing = {
     monthly: { pro: '$19.99', ultra: '$39.99', period: '/mes', btnPro: 'https://pay.hotmart.com/H106555637K?off=0dzm4of2&checkoutMode=10', btnUltra: 'https://pay.hotmart.com/H106555637K?off=jzdv47k9&checkoutMode=10' },
-    annual:  { pro: '$11.99', ultra: '$23.99', period: '/mes · facturado anual', btnPro: '', btnUltra: '' },
+    annual:  { pro: '$11.99', ultra: '$23.99', period: '/mes · facturado anual', btnPro: 'https://pay.hotmart.com/H106555637K?off=jte7teoo&checkoutMode=10', btnUltra: 'https://pay.hotmart.com/H106555637K?off=0n5icuxl&checkoutMode=10' },
   };
 
   function setPricing(mode) {
@@ -1422,8 +1422,8 @@
     document.getElementById('price-ultra').textContent  = pricing[mode].ultra;
     document.getElementById('period-ultra').textContent = pricing[mode].period;
     if (mode === 'annual') {
-      document.getElementById('btn-pro').onclick   = () => alert('Plan anual disponible proximamente. Elige el plan mensual por ahora.');
-      document.getElementById('btn-ultra').onclick = () => alert('Plan anual disponible proximamente. Elige el plan mensual por ahora.');
+      document.getElementById('btn-pro').onclick   = () => window.open(prices.annual.btnPro,   '_blank');
+      document.getElementById('btn-ultra').onclick = () => window.open(prices.annual.btnUltra, '_blank');
     } else {
       document.getElementById('btn-pro').onclick   = () => window.open(pricing.monthly.btnPro, '_blank');
       document.getElementById('btn-ultra').onclick = () => window.open(pricing.monthly.btnUltra, '_blank');
